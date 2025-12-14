@@ -7,21 +7,33 @@ class WatchZoomState: ObservableObject {
     @Published var isZoomed: Bool = false
 }
 
-// MARK: - Zoomable Watch View
+// MARK: - Zoomable Watch View - FIXED VERSION
 struct ZoomableWatchView: View {
     let watch: WatchInfo
     let size: CGFloat
     @ObservedObject var zoomState: WatchZoomState
     
     var body: some View {
-        WatchFaceView(
-            watch: watch,
-            timeZone: .current,
-            size: size
-        )
-        .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5)
-        .scaleEffect(zoomState.isZoomed ? 1.4 : 1.0)
-        .animation(.spring(duration: 0.3, bounce: 0.3), value: zoomState.isZoomed)
+        // Use overlay with allowsHitTesting to scale WITHOUT affecting layout
+        ZStack {
+            // Invisible placeholder that maintains layout space
+            WatchFaceView(
+                watch: watch,
+                timeZone: .current,
+                size: size
+            )
+            .opacity(0)
+            
+            // Actual watch that scales with scaleEffect
+            WatchFaceView(
+                watch: watch,
+                timeZone: .current,
+                size: size
+            )
+            .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5)
+            .scaleEffect(zoomState.isZoomed ? 1.4 : 1.0, anchor: .center)
+            .animation(.spring(duration: 0.3, bounce: 0.3), value: zoomState.isZoomed)
+        }
     }
 }
 
@@ -335,13 +347,11 @@ class WatchCell: UICollectionViewCell {
         let state = WatchZoomState()
         zoomState = state
         
-        let watchView = VStack(spacing: 16) {
-            ZoomableWatchView(
-                watch: watch,
-                size: size,
-                zoomState: state
-            )
-        }
+        let watchView = ZoomableWatchView(
+            watch: watch,
+            size: size,
+            zoomState: state
+        )
         
         let hosting = UIHostingController(rootView: AnyView(watchView))
         hosting.view.backgroundColor = .clear
