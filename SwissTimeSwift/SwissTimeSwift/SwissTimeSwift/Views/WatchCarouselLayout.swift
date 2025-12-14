@@ -65,7 +65,7 @@ struct WatchCarouselRepresentable: UIViewRepresentable {
         let carousel = WatchCarouselView(
             watches: watches,
             geometry: geometry,
-            initialIndex: currentIndex, // PASS INITIAL INDEX
+            initialIndex: currentIndex,
             onIndexChanged: { newIndex in
                 DispatchQueue.main.async {
                     currentIndex = newIndex
@@ -78,14 +78,13 @@ struct WatchCarouselRepresentable: UIViewRepresentable {
             }
         )
         context.coordinator.carousel = carousel
-        context.coordinator.isFirstUpdate = true // Track first update
+        context.coordinator.isFirstUpdate = true
         return carousel
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
         guard let carousel = uiView as? WatchCarouselView else { return }
         
-        // Skip scroll on first update to let initial scroll work
         if context.coordinator.isFirstUpdate {
             context.coordinator.isFirstUpdate = false
             carousel.updateZoomState(isZoomed)
@@ -121,22 +120,21 @@ class WatchCarouselView: UIView {
     
     private var collectionView: UICollectionView!
     private var internalCurrentIndex: Int
-    private var isInitializing = true  // Suppress callbacks during setup
+    private var isInitializing = true
     private let horizontalPadding: CGFloat
     private var hasPerformedInitialScroll = false
     
     init(watches: [WatchInfo],
          geometry: GeometryProxy,
-         initialIndex: Int, // ADD INITIAL INDEX PARAMETER
+         initialIndex: Int,
          onIndexChanged: @escaping (Int) -> Void,
          onWatchTapped: @escaping () -> Void) {
         self.watches = watches
         self.geometry = geometry
-        self.internalCurrentIndex = initialIndex // SET INITIAL INDEX
+        self.internalCurrentIndex = initialIndex
         self.onIndexChanged = onIndexChanged
         self.onWatchTapped = onWatchTapped
         
-        // Calculate horizontal padding once
         self.horizontalPadding = (geometry.size.width - watchSize) / 2
         
         super.init(frame: .zero)
@@ -225,23 +223,17 @@ extension WatchCarouselView: UICollectionViewDataSource, UICollectionViewDelegat
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        // Perform initial scroll once after cells start appearing
         if !hasPerformedInitialScroll {
             hasPerformedInitialScroll = true
             
-            print("🎯 willDisplay: scrollToItem at index \(internalCurrentIndex)")
-            print("   Watch name: \(watches[internalCurrentIndex].name)")
-            
-            // Use scrollToItem like your example - simple and direct!
+            // Use scrollToItem - simple and works!
             collectionView.scrollToItem(
                 at: IndexPath(item: internalCurrentIndex, section: 0),
                 at: .centeredHorizontally,
                 animated: false
             )
             
-            // Re-enable callbacks
             DispatchQueue.main.async {
-                print("✅ Re-enabling callbacks")
                 self.isInitializing = false
             }
         }
@@ -260,22 +252,29 @@ extension WatchCarouselView: UICollectionViewDataSource, UICollectionViewDelegat
         
         layout.updateScales()
         
-        print("📜 scrollViewDidScroll: offset=\(scrollView.contentOffset.x), isInitializing=\(isInitializing)")
-        
-        // Don't update index during initialization
         if isInitializing {
             return
         }
         
+        // Ask the layout which item is closest to center
         let centerX = scrollView.contentOffset.x + scrollView.bounds.width / 2
-        let itemWidth = watchSize * overlapFactor
-        let index = Int(round((centerX - scrollView.contentInset.left) / itemWidth))
-        let clampedIndex = max(0, min(watches.count - 1, index))
         
-        if clampedIndex != internalCurrentIndex {
-            print("   → index changed from \(internalCurrentIndex) to \(clampedIndex)")
-            internalCurrentIndex = clampedIndex
-            onIndexChanged(clampedIndex)
+        guard let attributes = layout.layoutAttributesForElements(in: scrollView.bounds) else { return }
+        
+        var closestIndex = internalCurrentIndex
+        var minDistance = CGFloat.greatestFiniteMagnitude
+        
+        for attr in attributes {
+            let distance = abs(attr.center.x - centerX)
+            if distance < minDistance {
+                minDistance = distance
+                closestIndex = attr.indexPath.item
+            }
+        }
+        
+        if closestIndex != internalCurrentIndex {
+            internalCurrentIndex = closestIndex
+            onIndexChanged(closestIndex)
         }
     }
 }
