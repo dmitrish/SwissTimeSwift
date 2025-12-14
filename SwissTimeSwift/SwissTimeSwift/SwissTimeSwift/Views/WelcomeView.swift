@@ -50,22 +50,28 @@ struct WelcomeView: View {
                     WatchPagerView(
                         watches: WatchInfo.allWatches,
                         currentIndex: $currentWatchIndex,
-                        geometry: geometry
-                       // isZoomed: $isZoomed
+                        geometry: geometry,
+                        isZoomed: $isZoomed
                     )
                     .scaleEffect(isZoomed ? 1.4 : 1.0)
                     .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isZoomed)
+                    .onTapGesture {
+                        withAnimation {
+                            isZoomed.toggle()
+                        }
+                    }
                     
                     // Tap to zoom / Select button
                     if isZoomed {
                         Button(action: {
-                            // Select this watch - update based on your WatchViewModel implementation
-                            // For now, just dismiss zoom or navigate
+                            // Add the selected watch to the collection
+                            let selectedWatch = WatchInfo.allWatches[currentWatchIndex]
+                            watchViewModel.addWatch(selectedWatch)
+                            
+                            // Reset zoom
                             withAnimation {
                                 isZoomed = false
                             }
-                            // Add your selection logic here
-                            // e.g., save to UserDefaults, navigate to main screen, etc.
                         }) {
                             Text("Select this watch")
                                 .font(.headline)

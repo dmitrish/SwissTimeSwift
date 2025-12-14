@@ -6,56 +6,25 @@ struct WatchPagerView: View {
     let watches: [WatchInfo]
     @Binding var currentIndex: Int
     let geometry: GeometryProxy
+    @Binding var isZoomed: Bool
     
     var body: some View {
         WatchCarouselRepresentable(
             watches: watches,
             currentIndex: $currentIndex,
-            geometry: geometry
+            geometry: geometry,
+            isZoomed: $isZoomed
         )
-        .frame(height: 150) // Explicit height
+        .frame(height: 200) // Increased height to accommodate zoom
     }
 }
-
-/*struct WatchPagerView: View {
-    let watches: [WatchInfo]
-    @Binding var currentIndex: Int
-    let geometry: GeometryProxy
-    @Binding var isZoomed: Bool
-    
-    var body: some View {
-        TabView(selection: $currentIndex) {
-            ForEach(0..<watches.count, id: \.self) { index in
-                Image(watches[index].imageName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 200, height: 200)
-                    .tag(index)
-                    .onTapGesture {
-                        withAnimation {
-                            isZoomed.toggle()
-                        }
-                    }
-            }
-        }
-        .tabViewStyle(.page(indexDisplayMode: .never)) // Hide page indicators
-        .frame(height: 250)
-        .onChange(of: currentIndex) { _ in
-            // Reset zoom when swiping to a different watch
-            if isZoomed {
-                withAnimation {
-                    isZoomed = false
-                }
-            }
-        }
-    }
-} */
 
 // MARK: - UIViewRepresentable
 struct WatchCarouselRepresentable: UIViewRepresentable {
     let watches: [WatchInfo]
     @Binding var currentIndex: Int
     let geometry: GeometryProxy
+    @Binding var isZoomed: Bool
     
     func makeUIView(context: Context) -> UIView {
         let carousel = WatchCarouselView(
@@ -65,7 +34,13 @@ struct WatchCarouselRepresentable: UIViewRepresentable {
                 DispatchQueue.main.async {
                     currentIndex = newIndex
                 }
-            }
+            },
+            onWatchTapped: {
+                DispatchQueue.main.async {
+                    isZoomed.toggle()
+                }
+            },
+            isZoomed: isZoomed
         )
         return carousel
     }
@@ -77,6 +52,9 @@ struct WatchCarouselRepresentable: UIViewRepresentable {
         if carousel.getCurrentIndex() != currentIndex {
             carousel.scrollToIndex(currentIndex, animated: true)
         }
+        
+        // Update zoom state
+        carousel.updateZoomState(isZoomed)
     }
 }
 
@@ -85,17 +63,25 @@ class WatchCarouselView: UIView {
     private let watches: [WatchInfo]
     private let geometry: GeometryProxy
     private let onIndexChanged: (Int) -> Void
+    private let onWatchTapped: () -> Void
     
     private let watchSize: CGFloat = 125
     private let overlapFactor: CGFloat = 2/3
     
     private var collectionView: UICollectionView!
     private var internalCurrentIndex: Int = 0
+    private var isZoomed: Bool = false
     
-    init(watches: [WatchInfo], geometry: GeometryProxy, onIndexChanged: @escaping (Int) -> Void) {
+    init(watches: [WatchInfo],
+         geometry: GeometryProxy,
+         onIndexChanged: @escaping (Int) -> Void,
+         onWatchTapped: @escaping () -> Void,
+         isZoomed: Bool) {
         self.watches = watches
         self.geometry = geometry
         self.onIndexChanged = onIndexChanged
+        self.onWatchTapped = onWatchTapped
+        self.isZoomed = isZoomed
         super.init(frame: .zero)
         setupCollectionView()
     }
@@ -136,9 +122,6 @@ class WatchCarouselView: UIView {
             collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: trailingAnchor)
         ])
-        
-        // Debug: Print initial setup
-        print("Setup carousel with \(watches.count) watches")
     }
     
     func scrollToIndex(_ index: Int, animated: Bool) {
@@ -153,24 +136,43 @@ class WatchCarouselView: UIView {
     func getCurrentIndex() -> Int {
         return internalCurrentIndex
     }
+    
+    func updateZoomState(_ zoomed: Bool) {
+        if isZoomed != zoomed {
+            isZoomed = zoomed
+            // Reload the centered cell to update its zoom state
+            let indexPath = IndexPath(item: internalCurrentIndex, section: 0)
+            if let cell = collectionView.cellForItem(at: indexPath) as? WatchCell {
+                cell.setZoomed(isZoomed, animated: true)
+            }
+        }
+    }
 }
 
 // MARK: - UICollectionView DataSource & Delegate
 extension WatchCarouselView: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        print("Number of items: \(watches.count)")
         return watches.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        print("Creating cell for index: \(indexPath.item)")
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "WatchCell", for: indexPath) as! WatchCell
         cell.configure(with: watches[indexPath.item], size: watchSize)
+        
+        // Apply zoom state if this is the centered cell
+        if indexPath.item == internalCurrentIndex && isZoomed {
+            cell.setZoomed(true, animated: false)
+        }
+        
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if indexPath.item != internalCurrentIndex {
+        if indexPath.item == internalCurrentIndex {
+            // Tapped on centered watch - toggle zoom
+            onWatchTapped()
+        } else {
+            // Tapped on non-centered watch - scroll to it
             scrollToIndex(indexPath.item, animated: true)
         }
     }
@@ -188,6 +190,13 @@ extension WatchCarouselView: UICollectionViewDataSource, UICollectionViewDelegat
         let clampedIndex = max(0, min(watches.count - 1, index))
         
         if clampedIndex != internalCurrentIndex {
+            // Reset zoom when scrolling to a different watch
+            if isZoomed {
+                if let oldCell = collectionView.cellForItem(at: IndexPath(item: internalCurrentIndex, section: 0)) as? WatchCell {
+                    oldCell.setZoomed(false, animated: true)
+                }
+            }
+            
             internalCurrentIndex = clampedIndex
             onIndexChanged(clampedIndex)
         }
@@ -208,10 +217,7 @@ class WatchCarouselLayout: UICollectionViewFlowLayout {
         
         self.scrollDirection = .horizontal
         self.itemSize = watchItemSize
-        // Negative spacing creates overlap
         self.minimumLineSpacing = -(watchSize * (1 - overlapFactor))
-        
-        print("Layout initialized with itemSize: \(watchItemSize), spacing: \(self.minimumLineSpacing)")
     }
     
     required init?(coder: NSCoder) {
@@ -236,12 +242,11 @@ class WatchCarouselLayout: UICollectionViewFlowLayout {
             let scale = 1.2 - (normalizedDistance * 0.2)
             newAttr.transform = CGAffineTransform(scaleX: scale, y: scale)
             
-            // Z-index: items to the left get increasing z-index, items to the right get decreasing z-index
+            // Z-index
             let isLeftOfCenter = newAttr.center.x < centerX
             if isLeftOfCenter {
                 newAttr.zIndex = newAttr.indexPath.item
             } else {
-                // Items to the right: closer to center = higher z-index
                 newAttr.zIndex = 10000 - newAttr.indexPath.item
             }
             
@@ -254,7 +259,6 @@ class WatchCarouselLayout: UICollectionViewFlowLayout {
     }
     
     func updateScales() {
-        // This triggers layout invalidation
         invalidateLayout()
     }
     
@@ -297,6 +301,7 @@ class WatchCarouselLayout: UICollectionViewFlowLayout {
 // MARK: - Watch Cell
 class WatchCell: UICollectionViewCell {
     private var hostingController: UIHostingController<AnyView>?
+    private var zoomScale: CGFloat = 1.0
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -329,19 +334,43 @@ class WatchCell: UICollectionViewCell {
         
         contentView.addSubview(hosting.view)
         NSLayoutConstraint.activate([
-            hosting.view.topAnchor.constraint(equalTo: contentView.topAnchor),
-            hosting.view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-            hosting.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            hosting.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
+            hosting.view.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            hosting.view.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            hosting.view.widthAnchor.constraint(equalTo: contentView.widthAnchor),
+            hosting.view.heightAnchor.constraint(equalTo: contentView.heightAnchor)
         ])
         
         hostingController = hosting
         
-        print("Configured cell with watch: \(watch.id)")
+        // Apply current zoom if any
+        hosting.view.transform = CGAffineTransform(scaleX: zoomScale, y: zoomScale)
+    }
+    
+    func setZoomed(_ zoomed: Bool, animated: Bool) {
+        let newScale: CGFloat = zoomed ? 1.4 : 1.0
+        zoomScale = newScale
+        
+        guard let view = hostingController?.view else { return }
+        
+        if animated {
+            UIView.animate(
+                withDuration: 0.3,
+                delay: 0,
+                usingSpringWithDamping: 0.7,
+                initialSpringVelocity: 0,
+                options: [.curveEaseInOut]
+            ) {
+                view.transform = CGAffineTransform(scaleX: newScale, y: newScale)
+            }
+        } else {
+            view.transform = CGAffineTransform(scaleX: newScale, y: newScale)
+        }
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        zoomScale = 1.0
+        hostingController?.view.transform = .identity
         hostingController?.view.removeFromSuperview()
         hostingController = nil
     }
