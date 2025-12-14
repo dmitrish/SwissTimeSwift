@@ -50,7 +50,7 @@ struct WatchPagerView: View {
             geometry: geometry,
             isZoomed: $isZoomed
         )
-        .frame(height: 200)
+        .frame(height: 240)  // Increased from 200 to accommodate 1.4x zoom
     }
 }
 
@@ -226,14 +226,20 @@ extension WatchCarouselView: UICollectionViewDataSource, UICollectionViewDelegat
         if !hasPerformedInitialScroll {
             hasPerformedInitialScroll = true
             
-            // Use scrollToItem - simple and works!
             collectionView.scrollToItem(
                 at: IndexPath(item: internalCurrentIndex, section: 0),
                 at: .centeredHorizontally,
                 animated: false
             )
             
+            // Force immediate layout update and cell reload to apply transforms
             DispatchQueue.main.async {
+                collectionView.collectionViewLayout.invalidateLayout()
+                collectionView.layoutIfNeeded()
+                // Reload visible cells to apply transforms
+                if let visibleIndexPaths = collectionView.indexPathsForVisibleItems as? [IndexPath] {
+                    collectionView.reloadItems(at: visibleIndexPaths)
+                }
                 self.isInitializing = false
             }
         }
@@ -250,15 +256,14 @@ extension WatchCarouselView: UICollectionViewDataSource, UICollectionViewDelegat
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         guard let layout = collectionView.collectionViewLayout as? WatchCarouselLayout else { return }
         
+        // This triggers layout invalidation which applies the scale transforms
         layout.updateScales()
         
         if isInitializing {
             return
         }
         
-        // Ask the layout which item is closest to center
         let centerX = scrollView.contentOffset.x + scrollView.bounds.width / 2
-        
         guard let attributes = layout.layoutAttributesForElements(in: scrollView.bounds) else { return }
         
         var closestIndex = internalCurrentIndex
@@ -310,10 +315,13 @@ class WatchCarouselLayout: UICollectionViewFlowLayout {
             guard let newAttr = attr.copy() as? UICollectionViewLayoutAttributes else { return nil }
             
             let distance = abs(newAttr.center.x - centerX)
-            let maxDistance = collectionView.bounds.width / 2
+            // Use item width as maxDistance for controlled scaling
+            let itemWidth = watchSize * overlapFactor
+            let maxDistance = itemWidth * 1.75  // Balanced drop-off
             let normalizedDistance = min(distance / maxDistance, 1.0)
             
-            let scale = 1.2 - (normalizedDistance * 0.2)
+            // Scale: 1.2 at center, 1.0 at edges
+            let scale = 1.0 + (0.2 * (1.0 - normalizedDistance))
             newAttr.transform = CGAffineTransform(scaleX: scale, y: scale)
             
             let isLeftOfCenter = newAttr.center.x < centerX
@@ -325,6 +333,33 @@ class WatchCarouselLayout: UICollectionViewFlowLayout {
             
             return newAttr
         }
+    }
+    
+    // CRITICAL: Must override this too!
+    override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        guard let attributes = super.layoutAttributesForItem(at: indexPath)?.copy() as? UICollectionViewLayoutAttributes else {
+            return nil
+        }
+        guard let collectionView = collectionView else { return attributes }
+        
+        let centerX = collectionView.contentOffset.x + collectionView.bounds.width / 2
+        
+        let distance = abs(attributes.center.x - centerX)
+        let itemWidth = watchSize * overlapFactor
+        let maxDistance = itemWidth * 1.75
+        let normalizedDistance = min(distance / maxDistance, 1.0)
+        
+        let scale = 1.0 + (0.2 * (1.0 - normalizedDistance))
+        attributes.transform = CGAffineTransform(scaleX: scale, y: scale)
+        
+        let isLeftOfCenter = attributes.center.x < centerX
+        if isLeftOfCenter {
+            attributes.zIndex = attributes.indexPath.item
+        } else {
+            attributes.zIndex = 10000 - attributes.indexPath.item
+        }
+        
+        return attributes
     }
     
     override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
@@ -423,5 +458,13 @@ class WatchCell: UICollectionViewCell {
         zoomState = nil
         hostingController?.view.removeFromSuperview()
         hostingController = nil
+    }
+    
+    // This is key - apply the transform from layout attributes
+    override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
+        super.apply(layoutAttributes)
+        // Don't apply to cell layer - SwiftUI content ignores it
+        // Instead apply directly to the hosting controller's view
+        hostingController?.view.layer.transform = CATransform3DMakeAffineTransform(layoutAttributes.transform)
     }
 }
