@@ -46,20 +46,13 @@ struct WelcomeView: View {
                             .padding(.horizontal)
                     }
                     
-                    // Watch Pager
+                    // Watch Pager - zoom is handled internally
                     WatchPagerView(
                         watches: WatchInfo.allWatches,
                         currentIndex: $currentWatchIndex,
                         geometry: geometry,
                         isZoomed: $isZoomed
                     )
-                    .scaleEffect(isZoomed ? 1.4 : 1.0)
-                    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isZoomed)
-                    .onTapGesture {
-                        withAnimation {
-                            isZoomed.toggle()
-                        }
-                    }
                     
                     // Tap to zoom / Select button
                     if isZoomed {
