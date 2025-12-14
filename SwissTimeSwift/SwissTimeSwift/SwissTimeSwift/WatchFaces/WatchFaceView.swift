@@ -31,15 +31,15 @@ struct WatchFaceView: View {
             case .romaMarina:
                 RomaMarinaWatchFace(timeZone: timeZone, size: size)
             case .kandinsky:
-                KandinskyWatchFace(timeZone: timeZone, size: size)
+                KandinskyEvening()
             case .pontifex:
-                PontifexWatchFace(timeZone: timeZone, size: size)
+               PontifexChronometra()
             case .knotUrushi:
                 KnotUrushi()
             case .centurio:
-                CenturioWatchFace(timeZone: timeZone, size: size)
+               CenturioLuminor()
             case .chronomagus:
-                ChronomagusWatchFace(timeZone: timeZone, size: size)
+               ChronomagusRegium()
             case .aventinus:
                 AventinusWatchFace(timeZone: timeZone, size: size)
             case .lucerna:

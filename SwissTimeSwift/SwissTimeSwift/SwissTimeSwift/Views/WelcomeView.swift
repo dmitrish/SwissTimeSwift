@@ -1,7 +1,101 @@
 import SwiftUI
 
+struct WelcomeView: View {
+    @EnvironmentObject var watchViewModel: WatchViewModel
+    @State private var currentWatchIndex = 0
+    @State private var isZoomed = false
+    
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack {
+                // Header section at 1/4 from top
+                VStack(spacing: 16) {
+                    Image(systemName: "clock.badge.plus")
+                        .font(.system(size: 80))
+                        .foregroundColor(.blue)
+                    
+                    Text("Let's get started!")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .multilineTextAlignment(.center)
+                    
+                    Text("Choose your first watch")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                        .padding(.top, 8)
+                }
+                .position(
+                    x: geometry.size.width / 2,
+                    y: geometry.size.height / 4
+                )
+                
+                // Watch Pager positioned at 1/4 from bottom
+                VStack(spacing: 20) {
+                    // Current watch info ABOVE the watch
+                    VStack(spacing: 8) {
+                        Text(WatchInfo.allWatches[currentWatchIndex].name)
+                            .font(.title2)
+                            .fontWeight(.medium)
+                            .multilineTextAlignment(.center)
+                        
+                        Text(WatchInfo.allWatches[currentWatchIndex].description)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .lineLimit(2)
+                            .padding(.horizontal)
+                    }
+                    
+                    // Watch Pager
+                    WatchPagerView(
+                        watches: WatchInfo.allWatches,
+                        currentIndex: $currentWatchIndex,
+                        geometry: geometry
+                       // isZoomed: $isZoomed
+                    )
+                    .scaleEffect(isZoomed ? 1.4 : 1.0)
+                    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isZoomed)
+                    
+                    // Tap to zoom / Select button
+                    if isZoomed {
+                        Button(action: {
+                            // Select this watch - update based on your WatchViewModel implementation
+                            // For now, just dismiss zoom or navigate
+                            withAnimation {
+                                isZoomed = false
+                            }
+                            // Add your selection logic here
+                            // e.g., save to UserDefaults, navigate to main screen, etc.
+                        }) {
+                            Text("Select this watch")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .frame(maxWidth: 200)
+                                .padding(.vertical, 12)
+                                .background(Color.blue)
+                                .cornerRadius(10)
+                        }
+                        .transition(.opacity)
+                    } else {
+                        Text("Tap to zoom")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .transition(.opacity)
+                    }
+                }
+                .position(
+                    x: geometry.size.width / 2,
+                    y: geometry.size.height - (geometry.size.height / 4)
+                )
+                .padding(.horizontal, 32)
+            }
+        }
+        .navigationTitle("Welcome")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
   // Welcome/onboarding view shown when no watches are selected (equivalent to Android WelcomeScreen)
-  struct WelcomeView: View {
+ /* struct WelcomeView: View {
       @EnvironmentObject var watchViewModel: WatchViewModel
       @State private var currentWatchIndex = 0
 
@@ -17,16 +111,16 @@ import SwiftUI
                               .font(.system(size: 80))
                               .foregroundColor(.blue)
 
-                          Text("Welcome to Swiss Time")
+                          Text("Let's get started!")
                               .font(.largeTitle)
                               .fontWeight(.bold)
                               .multilineTextAlignment(.center)
-
-                          Text("Experience luxury timepieces from around the world")
+/*
+                          Text("Choose your first watch")
                               .font(.title3)
                               .foregroundColor(.secondary)
                               .multilineTextAlignment(.center)
-                              .padding(.horizontal)
+                              .padding(.horizontal)*/
                       }
 
                       // Watch Pager
@@ -69,7 +163,7 @@ import SwiftUI
                       }
 
                       // Call to action
-                      VStack(spacing: 20) {
+                     /* VStack(spacing: 20) {
                           Text("Get started by selecting your favorite watch faces")
                               .font(.title2)
                               .fontWeight(.medium)
@@ -108,10 +202,10 @@ import SwiftUI
                               )
                               .padding(.horizontal, 32)
                           }
-                      }
+                      } */
 
                       // Features list
-                      VStack(alignment: .leading, spacing: 16) {
+                    /*  VStack(alignment: .leading, spacing: 16) {
                           FeatureRow(
                               icon: "globe",
                               title: "Multiple Time Zones",
@@ -129,7 +223,7 @@ import SwiftUI
                               title: "Customizable Settings",
                               description: "Personalize your timekeeping experience"
                           )
-                      }
+                      }*/
                       .padding(.horizontal, 32)
 
                       Spacer(minLength: 100) // Extra space for tab bar
@@ -141,10 +235,9 @@ import SwiftUI
           .navigationTitle("Welcome")
           .navigationBarTitleDisplayMode(.inline)
       }
-  }
-
+  } */
   // MARK: - Watch Pager View
-  struct WatchPagerView: View {
+ /* struct WatchPagerView: View {
       let watches: [WatchInfo]
       @Binding var currentIndex: Int
       let geometry: GeometryProxy
@@ -190,7 +283,7 @@ import SwiftUI
               }
           }
       }
-  }
+  }*/
 
   // MARK: - Feature Row
   struct FeatureRow: View {
