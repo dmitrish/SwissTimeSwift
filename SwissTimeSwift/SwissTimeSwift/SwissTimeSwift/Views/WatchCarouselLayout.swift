@@ -7,14 +7,13 @@ class WatchZoomState: ObservableObject {
     @Published var isZoomed: Bool = false
 }
 
-// MARK: - Zoomable Watch View - FIXED VERSION
+// MARK: - Zoomable Watch View
 struct ZoomableWatchView: View {
     let watch: WatchInfo
     let size: CGFloat
     @ObservedObject var zoomState: WatchZoomState
     
     var body: some View {
-        // Use overlay with allowsHitTesting to scale WITHOUT affecting layout
         ZStack {
             // Invisible placeholder that maintains layout space
             WatchFaceView(
@@ -24,7 +23,7 @@ struct ZoomableWatchView: View {
             )
             .opacity(0)
             
-            // Actual watch that scales with scaleEffect
+            // Actual watch that scales - won't affect layout!
             WatchFaceView(
                 watch: watch,
                 timeZone: .current,
@@ -66,6 +65,7 @@ struct WatchCarouselRepresentable: UIViewRepresentable {
         let carousel = WatchCarouselView(
             watches: watches,
             geometry: geometry,
+            initialIndex: currentIndex, // PASS INITIAL INDEX
             onIndexChanged: { newIndex in
                 DispatchQueue.main.async {
                     currentIndex = newIndex
@@ -77,11 +77,20 @@ struct WatchCarouselRepresentable: UIViewRepresentable {
                 }
             }
         )
+        context.coordinator.carousel = carousel
+        context.coordinator.isFirstUpdate = true // Track first update
         return carousel
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
         guard let carousel = uiView as? WatchCarouselView else { return }
+        
+        // Skip scroll on first update to let initial scroll work
+        if context.coordinator.isFirstUpdate {
+            context.coordinator.isFirstUpdate = false
+            carousel.updateZoomState(isZoomed)
+            return
+        }
         
         if carousel.getCurrentIndex() != currentIndex {
             carousel.scrollToIndex(currentIndex, animated: true)
@@ -96,6 +105,7 @@ struct WatchCarouselRepresentable: UIViewRepresentable {
     
     class Coordinator {
         weak var carousel: WatchCarouselView?
+        var isFirstUpdate = false
     }
 }
 
@@ -110,16 +120,25 @@ class WatchCarouselView: UIView {
     private let overlapFactor: CGFloat = 2/3
     
     private var collectionView: UICollectionView!
-    private var internalCurrentIndex: Int = 0
+    private var internalCurrentIndex: Int
+    private var isInitializing = true  // Suppress callbacks during setup
+    private let horizontalPadding: CGFloat
+    private var hasPerformedInitialScroll = false
     
     init(watches: [WatchInfo],
          geometry: GeometryProxy,
+         initialIndex: Int, // ADD INITIAL INDEX PARAMETER
          onIndexChanged: @escaping (Int) -> Void,
          onWatchTapped: @escaping () -> Void) {
         self.watches = watches
         self.geometry = geometry
+        self.internalCurrentIndex = initialIndex // SET INITIAL INDEX
         self.onIndexChanged = onIndexChanged
         self.onWatchTapped = onWatchTapped
+        
+        // Calculate horizontal padding once
+        self.horizontalPadding = (geometry.size.width - watchSize) / 2
+        
         super.init(frame: .zero)
         setupCollectionView()
     }
@@ -143,7 +162,6 @@ class WatchCarouselView: UIView {
         collectionView.dataSource = self
         collectionView.register(WatchCell.self, forCellWithReuseIdentifier: "WatchCell")
         
-        let horizontalPadding = (geometry.size.width - watchSize * overlapFactor) / 2
         collectionView.contentInset = UIEdgeInsets(
             top: 0,
             left: horizontalPadding,
@@ -159,18 +177,16 @@ class WatchCarouselView: UIView {
             collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: trailingAnchor)
         ])
-        
-        DispatchQueue.main.async { [weak self] in
-            self?.scrollToIndex(0, animated: false)
-        }
     }
     
-    func scrollToIndex(_ index: Int, animated: Bool) {
+    func scrollToIndex(_ index: Int, animated: Bool, silent: Bool = false) {
         guard index >= 0 && index < watches.count else { return }
         
         if index != internalCurrentIndex {
             internalCurrentIndex = index
-            onIndexChanged(index)
+            if !silent {
+                onIndexChanged(index)
+            }
         }
         
         collectionView.scrollToItem(
@@ -208,6 +224,29 @@ extension WatchCarouselView: UICollectionViewDataSource, UICollectionViewDelegat
         return cell
     }
     
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        // Perform initial scroll once after cells start appearing
+        if !hasPerformedInitialScroll {
+            hasPerformedInitialScroll = true
+            
+            print("🎯 willDisplay: scrollToItem at index \(internalCurrentIndex)")
+            print("   Watch name: \(watches[internalCurrentIndex].name)")
+            
+            // Use scrollToItem like your example - simple and direct!
+            collectionView.scrollToItem(
+                at: IndexPath(item: internalCurrentIndex, section: 0),
+                at: .centeredHorizontally,
+                animated: false
+            )
+            
+            // Re-enable callbacks
+            DispatchQueue.main.async {
+                print("✅ Re-enabling callbacks")
+                self.isInitializing = false
+            }
+        }
+    }
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if indexPath.item == internalCurrentIndex {
             onWatchTapped()
@@ -221,12 +260,20 @@ extension WatchCarouselView: UICollectionViewDataSource, UICollectionViewDelegat
         
         layout.updateScales()
         
+        print("📜 scrollViewDidScroll: offset=\(scrollView.contentOffset.x), isInitializing=\(isInitializing)")
+        
+        // Don't update index during initialization
+        if isInitializing {
+            return
+        }
+        
         let centerX = scrollView.contentOffset.x + scrollView.bounds.width / 2
         let itemWidth = watchSize * overlapFactor
         let index = Int(round((centerX - scrollView.contentInset.left) / itemWidth))
         let clampedIndex = max(0, min(watches.count - 1, index))
         
         if clampedIndex != internalCurrentIndex {
+            print("   → index changed from \(internalCurrentIndex) to \(clampedIndex)")
             internalCurrentIndex = clampedIndex
             onIndexChanged(clampedIndex)
         }

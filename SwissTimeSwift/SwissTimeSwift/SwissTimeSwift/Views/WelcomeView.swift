@@ -2,7 +2,9 @@ import SwiftUI
 
 struct WelcomeView: View {
     @EnvironmentObject var watchViewModel: WatchViewModel
-    @State private var currentWatchIndex = 0
+    
+    // Start at the middle watch (19 watches total, so middle is index 9)
+    @State private var currentWatchIndex = 9
     @State private var isZoomed = false
     
     var body: some View {
@@ -43,9 +45,8 @@ struct WelcomeView: View {
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
                             .lineLimit(2)
-                            // REMOVED .padding(.horizontal) to eliminate left margin
                     }
-                    .padding(.horizontal, 16) // Apply padding to the entire VStack instead
+                    .padding(.horizontal, 20)
                     
                     // Watch Pager - zoom is now handled WITHOUT layout shift
                     WatchPagerView(
@@ -55,7 +56,7 @@ struct WelcomeView: View {
                         isZoomed: $isZoomed
                     )
                     
-                    // Tap to zoom / Select button - FIXED SPACING
+                    // Tap to zoom / Select button
                     Group {
                         if isZoomed {
                             Button(action: {
@@ -84,13 +85,12 @@ struct WelcomeView: View {
                                 .transition(.opacity)
                         }
                     }
-                    .frame(height: 44) // Fixed height so switching doesn't shift layout
+                    .frame(height: 44)
                 }
                 .position(
                     x: geometry.size.width / 2,
                     y: geometry.size.height - (geometry.size.height / 4)
                 )
-                .padding(.horizontal, 32)
             }
         }
         .navigationTitle("Welcome")
