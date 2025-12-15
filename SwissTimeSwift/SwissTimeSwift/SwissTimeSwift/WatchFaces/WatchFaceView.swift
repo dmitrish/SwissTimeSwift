@@ -23,13 +23,13 @@ struct WatchFaceView: View {
             case .horologia:
                 HorologiaWatchFace(timeZone: timeZone, size: size)
             case .leonard:
-                LeonardWatchFace(timeZone: timeZone, size: size)
+                LeonardAutomaticWatch()
             case .yamaNoToki:
-                YamaNoTokiWatchFace(timeZone: timeZone, size: size)
+               YamaNoTokiWatch()
             case .constantinus:
-                ConstantinusWatchFace(timeZone: timeZone, size: size)
+             ConstantinusAureusChronometerWatch()
             case .romaMarina:
-                RomaMarinaWatchFace(timeZone: timeZone, size: size)
+               RomaMarinaWatch()
             case .kandinsky:
                 KandinskyEvening()
             case .pontifex:
@@ -46,13 +46,13 @@ struct WatchFaceView: View {
             case .lucerna:
                LucernaRoma()
             case .chantDuTemps:
-                ChantDuTempsWatchFace(timeZone: timeZone, size: size)
+               ChantDuTempsWatch()
             case .edgeOfSecond:
-                EdgeOfSecondWatchFace(timeZone: timeZone, size: size)
+                EdgeOfSecondWatch()
             case .zeitwerk:
                 ZeitwerkWatch()
             case .vostok:
-                VostokWatchFace(timeZone: timeZone, size: size)
+               VostokRussianMilitaryWatch()
             }
         }
         .frame(width: size, height: size)
