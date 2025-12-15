@@ -324,11 +324,19 @@ class WatchCarouselLayout: UICollectionViewFlowLayout {
             let scale = 1.0 + (0.3 * (1.0 - normalizedDistance))
             newAttr.transform = CGAffineTransform(scaleX: scale, y: scale)
             
-            let isLeftOfCenter = newAttr.center.x < centerX
-            if isLeftOfCenter {
-                newAttr.zIndex = newAttr.indexPath.item
+            // Z-index: centered item on top, then layer by position
+            let distanceFromCenter = abs(newAttr.center.x - centerX)
+            
+            if distanceFromCenter < 10 {
+                // This is the centered item - always on top
+                newAttr.zIndex = 20000
             } else {
-                newAttr.zIndex = 10000 - newAttr.indexPath.item
+                let isLeftOfCenter = newAttr.center.x < centerX
+                if isLeftOfCenter {
+                    newAttr.zIndex = newAttr.indexPath.item
+                } else {
+                    newAttr.zIndex = 10000 - newAttr.indexPath.item
+                }
             }
             
             return newAttr
@@ -352,11 +360,19 @@ class WatchCarouselLayout: UICollectionViewFlowLayout {
         let scale = 1.0 + (0.3 * (1.0 - normalizedDistance))
         attributes.transform = CGAffineTransform(scaleX: scale, y: scale)
         
-        let isLeftOfCenter = attributes.center.x < centerX
-        if isLeftOfCenter {
-            attributes.zIndex = attributes.indexPath.item
+        // Z-index: centered item on top, then layer by position
+        let distanceFromCenter = abs(attributes.center.x - centerX)
+        
+        if distanceFromCenter < 10 {
+            // This is the centered item - always on top
+            attributes.zIndex = 20000
         } else {
-            attributes.zIndex = 10000 - attributes.indexPath.item
+            let isLeftOfCenter = attributes.center.x < centerX
+            if isLeftOfCenter {
+                attributes.zIndex = attributes.indexPath.item
+            } else {
+                attributes.zIndex = 10000 - attributes.indexPath.item
+            }
         }
         
         return attributes
