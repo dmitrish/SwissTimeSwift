@@ -50,7 +50,7 @@ struct WatchPagerView: View {
             geometry: geometry,
             isZoomed: $isZoomed
         )
-        .frame(height: 240)  // Increased from 200 to accommodate 1.4x zoom
+        .frame(height: 260)  // Increased to accommodate 1.3x base scale + 1.4x zoom
     }
 }
 
@@ -317,11 +317,11 @@ class WatchCarouselLayout: UICollectionViewFlowLayout {
             let distance = abs(newAttr.center.x - centerX)
             // Use item width as maxDistance for controlled scaling
             let itemWidth = watchSize * overlapFactor
-            let maxDistance = itemWidth * 1.75  // Balanced drop-off
+            let maxDistance = itemWidth * 1.85  // More gradual drop-off
             let normalizedDistance = min(distance / maxDistance, 1.0)
             
-            // Scale: 1.2 at center, 1.0 at edges
-            let scale = 1.0 + (0.2 * (1.0 - normalizedDistance))
+            // Scale: 1.3 at center, 1.0 at edges
+            let scale = 1.0 + (0.3 * (1.0 - normalizedDistance))
             newAttr.transform = CGAffineTransform(scaleX: scale, y: scale)
             
             let isLeftOfCenter = newAttr.center.x < centerX
@@ -346,10 +346,10 @@ class WatchCarouselLayout: UICollectionViewFlowLayout {
         
         let distance = abs(attributes.center.x - centerX)
         let itemWidth = watchSize * overlapFactor
-        let maxDistance = itemWidth * 1.75
+        let maxDistance = itemWidth * 1.85
         let normalizedDistance = min(distance / maxDistance, 1.0)
         
-        let scale = 1.0 + (0.2 * (1.0 - normalizedDistance))
+        let scale = 1.0 + (0.3 * (1.0 - normalizedDistance))
         attributes.transform = CGAffineTransform(scaleX: scale, y: scale)
         
         let isLeftOfCenter = attributes.center.x < centerX
