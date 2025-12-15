@@ -41,7 +41,8 @@ struct WatchFaceView: View {
             case .chronomagus:
                ChronomagusRegium()
             case .aventinus:
-                AventinusWatchFace(timeZone: timeZone, size: size)
+              //  PontifexChronometra()
+                AventinusClassiqueWatch()
             case .lucerna:
                LucernaRoma()
             case .chantDuTemps:
@@ -49,7 +50,7 @@ struct WatchFaceView: View {
             case .edgeOfSecond:
                 EdgeOfSecondWatchFace(timeZone: timeZone, size: size)
             case .zeitwerk:
-                ZeitwerkWatchFace(timeZone: timeZone, size: size)
+                ZeitwerkWatch()
             case .vostok:
                 VostokWatchFace(timeZone: timeZone, size: size)
             }
