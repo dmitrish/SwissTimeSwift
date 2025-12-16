@@ -81,7 +81,7 @@ private func drawClockFace(context: GraphicsContext, center: CGPoint, radius: CG
         width: radius * 2,
         height: radius * 2
     ))
-    context.stroke(outerCircle, with: .color(clockBorderColor), lineWidth: 8)
+    context.stroke(outerCircle, with: .color(clockBorderColor), lineWidth: 2)
     
     // Inner circle (face)
     let innerCircle = Path(ellipseIn: CGRect(

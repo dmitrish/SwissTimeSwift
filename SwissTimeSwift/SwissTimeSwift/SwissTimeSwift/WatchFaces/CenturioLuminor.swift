@@ -26,9 +26,10 @@ struct CenturioLuminor: View {
                     let minute = calendar.component(.minute, from: currentTime)
                     let second = calendar.component(.second, from: currentTime)
                     
-                    let hourAngle = Double(hour * 30 + minute) * 0.5
-                    let minuteAngle = Double(minute * 6)
-                    let secondAngle = Double(second * 6)
+                    let hourAngle = Double(hour) * 30.0 + Double(minute) * 0.5
+                    let minuteAngle = Double(minute) * 6.0
+                    let secondAngle = Double(second) * 6.0
+
                     
                     drawHourHand(context: context, center: center, radius: radius, angle: hourAngle)
                     drawMinuteHand(context: context, center: center, radius: radius, angle: minuteAngle)
@@ -62,25 +63,27 @@ private func drawClockFace(context: GraphicsContext, center: CGPoint, radius: CG
         gradient,
         center: center,
         startRadius: 0,
-        endRadius: radius * 0.95
+        endRadius: radius * 0.97 // was 0.95 — expand dial to suit thinner rim
     )
     
+    // Dial (inner circle)
+    let dialScale: CGFloat = 0.97 // was 0.95 — slightly larger dial
     let dialCircle = Path(ellipseIn: CGRect(
-        x: center.x - radius * 0.95,
-        y: center.y - radius * 0.95,
-        width: radius * 1.9,
-        height: radius * 1.9
+        x: center.x - radius * dialScale,
+        y: center.y - radius * dialScale,
+        width: radius * 2 * dialScale,
+        height: radius * 2 * dialScale
     ))
     context.fill(dialCircle, with: radialGradient)
     
-    // Outer border
+    // Outer border — thinner stroke
     let outerCircle = Path(ellipseIn: CGRect(
         x: center.x - radius,
         y: center.y - radius,
         width: radius * 2,
         height: radius * 2
     ))
-    context.stroke(outerCircle, with: .color(clockBorderColor), lineWidth: 8)
+    context.stroke(outerCircle, with: .color(clockBorderColor), lineWidth: 2) // was 8
 }
 
 private func drawHourMarkers(context: GraphicsContext, center: CGPoint, radius: CGFloat) {
