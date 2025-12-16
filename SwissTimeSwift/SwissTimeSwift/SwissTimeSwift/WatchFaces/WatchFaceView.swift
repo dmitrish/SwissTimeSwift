@@ -17,11 +17,12 @@ struct WatchFaceView: View {
             case .valentinianus:
                 ValentinianusWatchFace(timeZone: timeZone, size: size)
             case .concordia:
-                ConcordiaWatchFace(timeZone: timeZone, size: size)
+                ChronomagusRegium()
+               // ConcordiaWatchFace(timeZone: timeZone, size: size)
             case .jurgsen:
-                JurgsenWatchFace(timeZone: timeZone, size: size)
+               JurgsenZenithor()
             case .horologia:
-                HorologiaWatchFace(timeZone: timeZone, size: size)
+                HorologiaRomanum()
             case .leonard:
                 LeonardAutomaticWatch()
             case .yamaNoToki:

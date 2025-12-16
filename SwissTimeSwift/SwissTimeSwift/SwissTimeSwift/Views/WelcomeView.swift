@@ -24,86 +24,79 @@ struct WelcomeView: View {
                     Text("Choose your first watch")
                         .font(.headline)
                         .foregroundColor(.secondary)
-                        .padding(.top, 8)
+                        .padding(.top, 2)
                 }
                 .position(
                     x: geometry.size.width / 2,
                     y: geometry.size.height / 4
                 )
                 
-                // Watch Pager positioned at 1/4 from bottom
-                VStack(spacing: 20) {
-                    // Current watch info ABOVE the watch
-                    VStack(spacing: 8) {
-                        Text(WatchInfo.allWatches[currentWatchIndex].name)
-                            .font(.title2)
-                            .fontWeight(.medium)
-                            .multilineTextAlignment(.center)
-                        
-                        Text(WatchInfo.allWatches[currentWatchIndex].description)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-                            .lineLimit(2)
-                    }
-                    .padding(.horizontal, 20)
+                // Watch section - anchored from BOTTOM
+                VStack(spacing: 0) {
+                    Spacer() // Push everything to the bottom
                     
-                    // Watch Pager - zoom is now handled WITHOUT layout shift
-                    WatchPagerView(
-                        watches: WatchInfo.allWatches,
-                        currentIndex: $currentWatchIndex,
-                        geometry: geometry,
-                        isZoomed: $isZoomed
-                    )
-                    
-                    // Tap to zoom / Select button
-                    Group {
-                        if isZoomed {
-                            Button(action: {
-                                // Add the selected watch to the collection
-                                let selectedWatch = WatchInfo.allWatches[currentWatchIndex]
-                                watchViewModel.addWatch(selectedWatch)
-                                
-                                // Reset zoom
-                                withAnimation {
-                                    isZoomed = false
-                                }
-                            }) {
-                                Text("Select this watch")
-                                    .font(.headline)
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: 200)
-                                    .padding(.vertical, 12)
-                                    .background(Color.blue)
-                                    .cornerRadius(10)
-                            }
-                            .transition(.opacity)
-                        } else {
-                            Text("Tap to zoom")
+                    VStack(spacing: 20) {
+                        // Current watch info ABOVE the watch
+                        VStack(spacing: 8) {
+                            Text(WatchInfo.allWatches[currentWatchIndex].name)
+                                .font(.title2)
+                                .fontWeight(.medium)
+                                .multilineTextAlignment(.center)
+                                .fixedSize(horizontal: false, vertical: true)
+                            
+                            Text(WatchInfo.allWatches[currentWatchIndex].description)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
-                                .transition(.opacity)
+                                .multilineTextAlignment(.center)
+                                .lineLimit(2)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
+                        .frame(height: 70, alignment: .bottom)
+                        .padding(.horizontal, 20)
+                        
+                        // Watch Pager
+                        WatchPagerView(
+                            watches: WatchInfo.allWatches,
+                            currentIndex: $currentWatchIndex,
+                            geometry: geometry,
+                            isZoomed: $isZoomed
+                        )
+                        
+                        // Tap to zoom / Select button
+                        Group {
+                            if isZoomed {
+                                Button(action: {
+                                    let selectedWatch = WatchInfo.allWatches[currentWatchIndex]
+                                    watchViewModel.addWatch(selectedWatch)
+                                    
+                                    withAnimation {
+                                        isZoomed = false
+                                    }
+                                }) {
+                                    Text("Select this watch")
+                                        .font(.headline)
+                                        .foregroundColor(.white)
+                                        .frame(maxWidth: 200)
+                                        .padding(.vertical, 12)
+                                        .background(Color.blue)
+                                        .cornerRadius(10)
+                                }
+                                .transition(.opacity)
+                            } else {
+                                Text("Tap to zoom")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                    .transition(.opacity)
+                            }
+                        }
+                        .frame(height: 44)
                     }
-                    .frame(height: 44)
+                    .padding(.bottom, geometry.size.height / 4 - 150)
                 }
-                .position(
-                    x: geometry.size.width / 2,
-                    y: geometry.size.height - (geometry.size.height / 4)
-                )
             }
         }
         .navigationTitle("Welcome")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar) // Add this line to hide the tab bar
     }
-}
-
-// MARK: - Preview
-#Preview {
-    NavigationView {
-        WelcomeView()
-    }
-    .environmentObject(WatchViewModel())
-    .environmentObject(ThemeViewModel())
-    .environmentObject(TimeZoneViewModel())
 }

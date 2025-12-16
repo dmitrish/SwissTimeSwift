@@ -18,11 +18,14 @@ struct TimeView: View {
                 EmptyWatchesView()
             } else {
                 // Show watch faces in pager
-                WatchFacePager(
-                    watches: watchViewModel.selectedWatches,
-                    selectedIndex: $selectedWatchIndex,
-                    geometry: geometry
-                )
+                VStack(spacing: 8) {
+                    WatchFacePager(
+                        watches: watchViewModel.selectedWatches,
+                        selectedIndex: $selectedWatchIndex,
+                        geometry: geometry
+                    )
+                    CustomWorldMapWithDayNight()
+                }
             }
         }
         .navigationTitle("Swiss Time")
@@ -85,7 +88,7 @@ struct WatchFacePager: View {
             .frame(height: min(geometry.size.width * 0.8, 350) + 50)
             
             // Page indicators
-            HStack(spacing: 8) {
+           /* HStack(spacing: 8) {
                 ForEach(0..<watches.count, id: \.self) { index in
                     Circle()
                     //    .fill(index == selectedIndex ? .accent : .secondary.opacity(0.3))
@@ -103,6 +106,7 @@ struct WatchFacePager: View {
                 .padding(.horizontal)
             
             Spacer()
+            */
         }
     }
 }
