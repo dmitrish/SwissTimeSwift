@@ -44,9 +44,9 @@ struct KnotUrushi: View {
                     let minute = comps.minute ?? 0
                     let second = comps.second ?? 0
 
-                    let hourAngle = Double(hour * 30 + minute) * 0.5
-                    let minuteAngle = Double(minute * 6)
-                    let secondAngle = Double(second * 6)
+                    let hourAngle = Double(hour) * 30.0 + Double(minute) * 0.5
+                    let minuteAngle = Double(minute) * 6.0
+                    let secondAngle = Double(second) * 6.0
 
                     drawClockHands(
                         context: context,
@@ -84,7 +84,7 @@ private func drawClockFace(context: GraphicsContext, center: CGPoint, radius: CG
         width: radius * 2,
         height: radius * 2
     ))
-    context.stroke(outerCircle, with: .color(urushiGold), lineWidth: 8)
+    context.stroke(outerCircle, with: .color(urushiGold), lineWidth: 2)
 
     // Main dial (urushi lacquer red)
     let dialCircle = Path(ellipseIn: CGRect(

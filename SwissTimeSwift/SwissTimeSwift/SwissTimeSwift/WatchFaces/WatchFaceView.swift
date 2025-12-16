@@ -90,7 +90,7 @@ struct WatchFaceView: View {
            case .centurio:
                CenturioLuminor()
            case .chronomagus:
-               ChronomagusRegium(timeZone: timeZone)
+               ChronomagusRegium(timeZone: TimeZone(identifier: "Asia/Tokyo")!)
            case .aventinus:
                AventinusClassiqueWatch()
            case .lucerna:
@@ -100,7 +100,7 @@ struct WatchFaceView: View {
            case .edgeOfSecond:
                EdgeOfSecondWatch()
            case .zeitwerk:
-               ZeitwerkWatch()
+               ZeitwerkWatch(timeZone: TimeZone(identifier: "Asia/Tokyo")!)
            case .vostok:
                VostokRussianMilitaryWatch()
            default:

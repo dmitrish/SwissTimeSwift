@@ -29,10 +29,10 @@ struct PontifexChronometra: View {
                     let minute = calendar.component(.minute, from: currentTime)
                     let second = calendar.component(.second, from: currentTime)
                     
-                    let hourAngle = Double(hour * 30 + minute) * 0.5
-                    let minuteAngle = Double(minute * 6)
-                    let secondAngle = Double(second * 6)
-                    
+                    let hourAngle = Double(hour) * 30.0 + Double(minute) * 0.5
+                    let minuteAngle = Double(minute) * 6.0
+                    let secondAngle = Double(second) * 6.0
+
                     drawClockHands(
                         context: context,
                         center: center,
