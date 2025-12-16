@@ -11,14 +11,14 @@ struct WatchFaceView: View {
     let timeZone: TimeZone
     let size: CGFloat
     
-    var body: some View {
+    /*var body: some View {
         Group {
             switch watch.watchFaceType {
-            case .valentinianus:
-                ValentinianusWatchFace(timeZone: timeZone, size: size)
-            case .concordia:
+           // case .valentinianus:
+             //   ValentinianusWatchFace(timeZone: timeZone, size: size)
+            /*case .concordia:
                 ChronomagusRegium()
-               // ConcordiaWatchFace(timeZone: timeZone, size: size)
+               // ConcordiaWatchFace(timeZone: timeZone, size: size)*/
             case .jurgsen:
                JurgsenZenithor()
             case .horologia:
@@ -28,15 +28,15 @@ struct WatchFaceView: View {
             case .yamaNoToki:
                YamaNoTokiWatch()
             case .constantinus:
-             ConstantinusAureusChronometerWatch()
+                ConstantinusAureusChronometerWatch()
             case .romaMarina:
                RomaMarinaWatch()
             case .kandinsky:
                 KandinskyEvening()
             case .pontifex:
                PontifexChronometra()
-            case .knotUrushi:
-                KnotUrushi()
+          /*  case .knotUrushi:
+               KnotUrushi(timeZone: <#T##TimeZone#>) */
             case .centurio:
                CenturioLuminor()
             case .chronomagus:
@@ -54,10 +54,64 @@ struct WatchFaceView: View {
                 ZeitwerkWatch()
             case .vostok:
                VostokRussianMilitaryWatch()
+            default:
+                VostokRussianMilitaryWatch()
             }
         }
         .frame(width: size, height: size)
-    }
+    } */
+    
+       @ViewBuilder
+       private var content: some View {
+           switch watch.watchFaceType {
+           case .valentinianus:
+               ValentinianusWatchFace(timeZone: timeZone, size: size)
+           /*case .concordia:
+               ChronomagusRegium()
+               // ConcordiaWatchFace(timeZone: timeZone, size: size)*/
+           case .jurgsen:
+               JurgsenZenithor()
+           case .horologia:
+               HorologiaRomanum()
+           case .leonard:
+               LeonardAutomaticWatch()
+           case .yamaNoToki:
+               YamaNoTokiWatch()
+           case .constantinus:
+               ConstantinusAureusChronometerWatch()
+           case .romaMarina:
+               RomaMarinaWatch()
+           case .kandinsky:
+               KandinskyEvening()
+           case .pontifex:
+               PontifexChronometra()
+           case .knotUrushi:
+               KnotUrushi(timeZone: timeZone)
+           case .centurio:
+               CenturioLuminor()
+           case .chronomagus:
+               ChronomagusRegium(timeZone: timeZone)
+           case .aventinus:
+               AventinusClassiqueWatch()
+           case .lucerna:
+               LucernaRoma()
+           case .chantDuTemps:
+               ChantDuTempsWatch()
+           case .edgeOfSecond:
+               EdgeOfSecondWatch()
+           case .zeitwerk:
+               ZeitwerkWatch()
+           case .vostok:
+               VostokRussianMilitaryWatch()
+           default:
+               VostokRussianMilitaryWatch()
+           }
+       }
+
+       var body: some View {
+           content
+               .frame(width: size, height: size)
+       }
 }
 
 // MARK: - Sample Watch Face Implementation
