@@ -1,9 +1,3 @@
-//
-//  LucernaRoma.swift
-//  SwissTimeSwift
-//
-//  Created by Shpinar Dmitri on 12/12/25.
-//
 
 
 import SwiftUI
