@@ -1,10 +1,3 @@
-//
-//  ChantDuTempsWatch.swift
-//  SwissTimeSwift
-//
-//  Created by Shpinar Dmitri on 12/14/25.
-//
-
 
 import SwiftUI
 

@@ -1,9 +1,4 @@
-//
-//  JurgsenZenithor.swift
-//  SwissTimeSwift
-//
-//  Created by Shpinar Dmitri on 12/15/25.
-//
+
 
 
 import SwiftUI
