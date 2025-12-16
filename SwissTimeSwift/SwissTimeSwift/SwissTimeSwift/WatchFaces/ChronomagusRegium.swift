@@ -1,6 +1,10 @@
 import SwiftUI
 
 struct ChronomagusRegium: View {
+    let timeZone: TimeZone
+    
+
+    
     @State private var currentTime = Date()
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
@@ -222,7 +226,7 @@ private func drawCenterDot(context: GraphicsContext, center: CGPoint, radius: CG
 
 struct ChronomagusRegium_Previews: PreviewProvider {
     static var previews: some View {
-        ChronomagusRegium()
+        ChronomagusRegium(timeZone: TimeZone.current)
             .frame(width: 300, height: 300)
             .background(Color.black)
     }
