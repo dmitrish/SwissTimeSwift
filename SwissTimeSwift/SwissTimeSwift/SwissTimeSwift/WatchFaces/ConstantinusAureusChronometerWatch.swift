@@ -60,9 +60,15 @@ private let numbersColor = Color(red: 0x00/255.0, green: 0x00/255.0, blue: 0x8B/
 private let powerReserveColor = Color(red: 0xB2/255.0, green: 0x22/255.0, blue: 0x22/255.0)
 private let centerDotColor = Color(red: 0x00/255.0, green: 0x00/255.0, blue: 0x8B/255.0)
 
+// MARK: - Border width constant
+private let outerBorderWidth: CGFloat = 2 // changed from 8 to 2
+
 // MARK: - Drawing Functions
 
 private func drawClockFace(context: GraphicsContext, center: CGPoint, radius: CGFloat, currentTime: Date) {
+    // Use a face radius that sits inside half the stroke width
+    let faceRadius = radius - outerBorderWidth / 2
+    
     // Outer circle (border)
     let outerCircle = Path(ellipseIn: CGRect(
         x: center.x - radius,
@@ -70,14 +76,14 @@ private func drawClockFace(context: GraphicsContext, center: CGPoint, radius: CG
         width: radius * 2,
         height: radius * 2
     ))
-    context.stroke(outerCircle, with: .color(clockBorderColor), lineWidth: 8)
+    context.stroke(outerCircle, with: .color(clockBorderColor), lineWidth: outerBorderWidth)
     
     // Inner circle (face)
     let innerCircle = Path(ellipseIn: CGRect(
-        x: center.x - (radius - 4),
-        y: center.y - (radius - 4),
-        width: (radius - 4) * 2,
-        height: (radius - 4) * 2
+        x: center.x - faceRadius,
+        y: center.y - faceRadius,
+        width: faceRadius * 2,
+        height: faceRadius * 2
     ))
     context.fill(innerCircle, with: .color(clockFaceColor))
     
@@ -153,7 +159,7 @@ private func drawClockFace(context: GraphicsContext, center: CGPoint, radius: CG
     context.stroke(powerReservePath, with: .color(clockBorderColor), lineWidth: 2)
     
     // Power reserve markings
-    for i in 0...4 {
+   /* for i in 0...4 {
         let angle = Double.pi * Double(i) / 4
         let markerX = center.x + CGFloat(cos(angle + Double.pi)) * (powerReserveWidth / 2)
         let markerY = powerReserveY
@@ -165,11 +171,11 @@ private func drawClockFace(context: GraphicsContext, center: CGPoint, radius: CG
             height: 4
         ))
         context.fill(marker, with: .color(clockBorderColor))
-    }
+    } */
     
     // Power reserve text
     context.draw(
-        Text("NAUTILUS CENTURION")
+        Text("aurelius")
             .font(.system(size: powerReserveHeight * 0.5))
             .foregroundColor(clockBorderColor),
         at: CGPoint(x: center.x, y: powerReserveY - powerReserveHeight * 1.2)
@@ -197,7 +203,7 @@ private func drawClockFace(context: GraphicsContext, center: CGPoint, radius: CG
     ), cornerRadius: radius * 0.02)
     
     context.fill(dateWindow, with: .color(.white))
-    context.stroke(dateWindow, with: .color(clockBorderColor), lineWidth: 2)
+    context.stroke(dateWindow, with: .color(clockBorderColor), lineWidth: 0.3)
     
     // Date text
     let calendar = Calendar.current
@@ -338,7 +344,7 @@ private func drawClockHands(
     var secondPath = Path()
     secondPath.move(to: CGPoint(x: 0, y: radius * 0.15))
     secondPath.addLine(to: CGPoint(x: 0, y: -radius * 0.75))
-    context.stroke(secondPath, with: .color(secondHandColor), style: StrokeStyle(lineWidth: 2, lineCap: .round))
+    context.stroke(secondPath, with: .color(secondHandColor), style: StrokeStyle(lineWidth: 0.75, lineCap: .round))
     
     // Arrow tip
     let arrowSize = radius * 0.05

@@ -312,7 +312,7 @@ private func drawClockHands(
     var secondPath = Path()
     secondPath.move(to: CGPoint(x: 0, y: radius * 0.15))
     secondPath.addLine(to: CGPoint(x: 0, y: -radius * 0.75))
-    context.stroke(secondPath, with: .color(secondHandColor), style: StrokeStyle(lineWidth: 2, lineCap: .round))
+    context.stroke(secondPath, with: .color(secondHandColor), style: StrokeStyle(lineWidth: 0.7, lineCap: .round))
     
     // Arrow tip
     let arrowSize = radius * 0.04
