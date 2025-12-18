@@ -1,5 +1,4 @@
 
-
 import SwiftUI
 
 struct LeonardAutomaticWatch: View {
@@ -62,9 +61,15 @@ private let moonphaseColor = Color(red: 0x00/255.0, green: 0x00/255.0, blue: 0x8
 private let moonColor = Color(red: 0xFF/255.0, green: 0xFA/255.0, blue: 0xCD/255.0) // Light yellow
 private let centerDotColor = Color(red: 0x00/255.0, green: 0x00/255.0, blue: 0x8B/255.0)
 
+// MARK: - Border width constant
+private let outerBorderWidth: CGFloat = 2 // changed from 6 to 2
+
 // MARK: - Drawing Functions
 
 private func drawClockFace(context: GraphicsContext, center: CGPoint, radius: CGFloat) {
+    // Face radius sits just inside half the stroke width
+    let faceRadius = radius - outerBorderWidth / 2
+    
     // Outer circle (border)
     let outerCircle = Path(ellipseIn: CGRect(
         x: center.x - radius,
@@ -72,24 +77,25 @@ private func drawClockFace(context: GraphicsContext, center: CGPoint, radius: CG
         width: radius * 2,
         height: radius * 2
     ))
-    context.stroke(outerCircle, with: .color(clockBorderColor), lineWidth: 6)
+    context.stroke(outerCircle, with: .color(clockBorderColor), lineWidth: outerBorderWidth)
     
     // Inner circle (face)
     let innerCircle = Path(ellipseIn: CGRect(
-        x: center.x - (radius - 3),
-        y: center.y - (radius - 3),
-        width: (radius - 3) * 2,
-        height: (radius - 3) * 2
+        x: center.x - faceRadius,
+        y: center.y - faceRadius,
+        width: faceRadius * 2,
+        height: faceRadius * 2
     ))
     context.fill(innerCircle, with: .color(clockFaceColor))
     
     // Subtle guilloche pattern (concentric circles)
     for i in 1...8 {
+        let factor = (0.9 - CGFloat(i) * 0.1)
         let guillocheCircle = Path(ellipseIn: CGRect(
-            x: center.x - radius * (0.9 - CGFloat(i) * 0.1),
-            y: center.y - radius * (0.9 - CGFloat(i) * 0.1),
-            width: radius * 2 * (0.9 - CGFloat(i) * 0.1),
-            height: radius * 2 * (0.9 - CGFloat(i) * 0.1)
+            x: center.x - radius * factor,
+            y: center.y - radius * factor,
+            width: radius * 2 * factor,
+            height: radius * 2 * factor
         ))
         context.stroke(guillocheCircle, with: .color(.black.opacity(0.03)), lineWidth: 1)
     }
@@ -171,7 +177,7 @@ private func drawClockFace(context: GraphicsContext, center: CGPoint, radius: CG
     }
     
     // Draw decorative frame around moonphase
-    context.stroke(moonphaseRect, with: .color(clockBorderColor), lineWidth: 2)
+    context.stroke(moonphaseRect, with: .color(clockBorderColor), lineWidth: 0.7)
 }
 
 private func drawHourMarkersAndNumbers(context: GraphicsContext, center: CGPoint, radius: CGFloat, currentTime: Date) {
@@ -223,7 +229,7 @@ private func drawHourMarkersAndNumbers(context: GraphicsContext, center: CGPoint
         height: radius * 0.12
     ))
     context.fill(dateWindow, with: .color(.white))
-    context.stroke(dateWindow, with: .color(.black), lineWidth: 1)
+    context.stroke(dateWindow, with: .color(.black), lineWidth: 0.4)
     
     // Date text
     let calendar = Calendar.current
@@ -304,7 +310,7 @@ private func drawClockHands(
     var secondPath = Path()
     secondPath.move(to: CGPoint(x: 0, y: radius * 0.15))
     secondPath.addLine(to: CGPoint(x: 0, y: -radius * 0.75))
-    context.stroke(secondPath, with: .color(secondHandColor), style: StrokeStyle(lineWidth: 1.5, lineCap: .round))
+    context.stroke(secondPath, with: .color(secondHandColor), style: StrokeStyle(lineWidth: 0.4, lineCap: .round))
     
     // Counterbalance
     let counterbalance = Path(ellipseIn: CGRect(
