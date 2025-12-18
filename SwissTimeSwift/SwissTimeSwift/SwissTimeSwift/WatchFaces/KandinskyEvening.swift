@@ -1,6 +1,3 @@
-
-
-
 import SwiftUI
 
 struct KandinskyEvening: View {
@@ -11,7 +8,7 @@ struct KandinskyEvening: View {
         GeometryReader { geometry in
             let size = min(geometry.size.width, geometry.size.height)
             let center = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
-            let radius = size / 2 * 0.8
+            let radius = size / 2 * 0.83
             
             ZStack {
                 // Static content
@@ -48,7 +45,7 @@ struct KandinskyEvening: View {
 // MARK: - Colors (Kandinsky's "Circles in a Circle" inspired)
 
 private let backgroundColor = Color(red: 0.961, green: 0.961, blue: 0.961)  // Light background
-private let clockBorderColor = Color.black
+private let clockBorderColor = Color(red: 0.19, green: 0.19, blue: 0.19)
 private let hourHandColor = Color(red: 1.0, green: 0.498, blue: 0.314)      // Orange
 private let minuteHandColor = Color(red: 1.0, green: 0.498, blue: 0.314)    // Orange
 private let secondHandColor = Color(red: 0.820, green: 0.231, blue: 0.251)  // Red
@@ -82,7 +79,7 @@ private func drawClockFace(context: GraphicsContext, center: CGPoint, radius: CG
         width: radius * 2,
         height: radius * 2
     ))
-    context.stroke(outerCircle, with: .color(clockBorderColor), lineWidth: 8)
+    context.stroke(outerCircle, with: .color(clockBorderColor), lineWidth: 4)
     
     // Draw Kandinsky's "Circles in a Circle" inspired design
     let lineWidth: CGFloat = 3
