@@ -1,6 +1,4 @@
 
-
-
 import SwiftUI
 
 struct YamaNoTokiWatch: View {
@@ -68,9 +66,15 @@ private let numbersColor = Color.black
 private let powerReserveColor = Color(red: 0xB8/255.0, green: 0x86/255.0, blue: 0x0B/255.0)
 private let centerDotColor = Color.black
 
+// MARK: - Border width constant
+private let outerBorderWidth: CGFloat = 2 // changed from 6 to 2
+
 // MARK: - Drawing Functions
 
 private func drawClockFace(context: GraphicsContext, center: CGPoint, radius: CGFloat) {
+    // Face radius sits just inside half the stroke width
+    let faceRadius = radius - outerBorderWidth / 2
+
     // Outer circle (border)
     let outerCircle = Path(ellipseIn: CGRect(
         x: center.x - radius,
@@ -78,14 +82,14 @@ private func drawClockFace(context: GraphicsContext, center: CGPoint, radius: CG
         width: radius * 2,
         height: radius * 2
     ))
-    context.stroke(outerCircle, with: .color(clockBorderColor), lineWidth: 6)
+    context.stroke(outerCircle, with: .color(clockBorderColor), lineWidth: outerBorderWidth)
     
     // Inner circle (face)
     let innerCircle = Path(ellipseIn: CGRect(
-        x: center.x - (radius - 3),
-        y: center.y - (radius - 3),
-        width: (radius - 3) * 2,
-        height: (radius - 3) * 2
+        x: center.x - faceRadius,
+        y: center.y - faceRadius,
+        width: faceRadius * 2,
+        height: faceRadius * 2
     ))
     context.fill(innerCircle, with: .color(clockFaceColor))
     
@@ -147,14 +151,14 @@ private func drawClockFace(context: GraphicsContext, center: CGPoint, radius: CG
     let powerReserveHeight = radius * 0.1
     
     // Power reserve background
-    let powerReserveRect = Path(CGRect(
+   /* let powerReserveRect = Path(CGRect(
         x: center.x - powerReserveWidth / 2,
         y: powerReserveY - powerReserveHeight / 2,
         width: powerReserveWidth,
         height: powerReserveHeight
     ))
     context.fill(powerReserveRect, with: .color(.white))
-    context.stroke(powerReserveRect, with: .color(.black), lineWidth: 1)
+    context.stroke(powerReserveRect, with: .color(.black), lineWidth: 0.3)
     
     // Power reserve markings
     for i in 0...8 {
@@ -173,17 +177,17 @@ private func drawClockFace(context: GraphicsContext, center: CGPoint, radius: CG
             .font(.system(size: powerReserveHeight * 0.6))
             .foregroundColor(.black),
         at: CGPoint(x: center.x, y: powerReserveY + powerReserveHeight / 4)
-    )
+    ) */
     
     // Power reserve indicator (75% full)
-    let indicatorWidth = powerReserveWidth * 0.75
+   /* let indicatorWidth = powerReserveWidth * 0.75
     let indicator = Path(CGRect(
         x: center.x - powerReserveWidth / 2,
         y: powerReserveY - powerReserveHeight / 2,
         width: indicatorWidth,
         height: powerReserveHeight
     ))
-    context.fill(indicator, with: .color(powerReserveColor))
+    context.fill(indicator, with: .color(powerReserveColor))*/
     
     // Small seconds subdial at 6 o'clock
     let secondsSubdialY = center.y + radius * 0.25
@@ -197,7 +201,7 @@ private func drawClockFace(context: GraphicsContext, center: CGPoint, radius: CG
         height: secondsSubdialRadius * 2
     ))
     context.fill(subdialCircle, with: .color(.white))
-    context.stroke(subdialCircle, with: .color(.black), lineWidth: 1)
+    context.stroke(subdialCircle, with: .color(.black), lineWidth: 0.3)
     
     // Subdial markers
     for i in 0..<60 {
@@ -214,7 +218,7 @@ private func drawClockFace(context: GraphicsContext, center: CGPoint, radius: CG
             y: secondsSubdialY + CGFloat(sin(angle)) * secondsSubdialRadius * 0.9
         ))
         
-        context.stroke(path, with: .color(.black), lineWidth: i % 15 == 0 ? 1.5 : 0.5)
+        context.stroke(path, with: .color(.black), lineWidth: i % 15 == 0 ? 0.7 : 0.3)
     }
     
     // Subdial numbers (60, 15, 30, 45)
@@ -301,7 +305,7 @@ private func drawHourMarkersAndNumbers(context: GraphicsContext, center: CGPoint
         height: radius * 0.12
     ))
     context.fill(dateWindow, with: .color(.white))
-    context.stroke(dateWindow, with: .color(clockBorderColor), lineWidth: 1)
+    context.stroke(dateWindow, with: .color(clockBorderColor), lineWidth: 0.3)
     
     // Date text
     let calendar = Calendar.current
@@ -378,7 +382,7 @@ private func drawSubdialSecondHand(
     context.stroke(
         secondPath,
         with: .color(secondHandColor),
-        style: StrokeStyle(lineWidth: 1.5, lineCap: .round)
+        style: StrokeStyle(lineWidth: 0.5, lineCap: .round)
     )
     
     context.rotate(by: .degrees(-secondAngle))
