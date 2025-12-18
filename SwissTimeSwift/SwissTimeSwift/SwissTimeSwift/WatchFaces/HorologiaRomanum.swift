@@ -1,5 +1,4 @@
 
-
 import SwiftUI
 
 struct HorologiaRomanum: View {
@@ -56,9 +55,15 @@ private let subdialColor = Color(red: 0.878, green: 0.878, blue: 0.878)
 private let subdialHandColor = Color(red: 0.0, green: 0.0, blue: 0.502)
 private let centerDotColor = Color(red: 0.0, green: 0.0, blue: 0.502)
 
+// MARK: - Border width constant
+private let outerBorderWidth: CGFloat = 2 // changed from 6 to 2
+
 // MARK: - Drawing Functions
 
 private func drawStaticElements(context: GraphicsContext, center: CGPoint, radius: CGFloat) {
+    // Dial face radius sits just inside half the stroke width
+    let faceRadius = radius - outerBorderWidth / 2
+    
     // Draw outer border
     let outerCircle = Path(ellipseIn: CGRect(
         x: center.x - radius,
@@ -66,14 +71,14 @@ private func drawStaticElements(context: GraphicsContext, center: CGPoint, radiu
         width: radius * 2,
         height: radius * 2
     ))
-    context.stroke(outerCircle, with: .color(clockBorderColor), lineWidth: 6)
+    context.stroke(outerCircle, with: .color(clockBorderColor), lineWidth: outerBorderWidth)
     
     // Draw main face
     let mainFace = Path(ellipseIn: CGRect(
-        x: center.x - (radius - 3),
-        y: center.y - (radius - 3),
-        width: (radius - 3) * 2,
-        height: (radius - 3) * 2
+        x: center.x - faceRadius,
+        y: center.y - faceRadius,
+        width: faceRadius * 2,
+        height: faceRadius * 2
     ))
     context.fill(mainFace, with: .color(clockFaceColor))
     
@@ -106,7 +111,7 @@ private func drawSubdialBackground(context: GraphicsContext, center: CGPoint, ra
     context.fill(subdialFace, with: .color(subdialColor))
     
     // Draw subdial border
-    context.stroke(subdialFace, with: .color(.black), lineWidth: 2)
+    context.stroke(subdialFace, with: .color(.black), lineWidth: 0.3)
     
     // Draw subdial markers
     for i in 0..<60 {
@@ -129,7 +134,7 @@ private func drawSubdialBackground(context: GraphicsContext, center: CGPoint, ra
         path.move(to: CGPoint(x: startX, y: startY))
         path.addLine(to: CGPoint(x: endX, y: endY))
         
-        let strokeWidth: CGFloat = (i % 15 == 0) ? 1.5 : 1
+        let strokeWidth: CGFloat = (i % 15 == 0) ? 0.7 : 0.3
         context.stroke(path, with: .color(.black), lineWidth: strokeWidth)
     }
     
@@ -154,7 +159,7 @@ private func drawHourMarkersAndNumbers(context: GraphicsContext, center: CGPoint
     for i in 1...60 {
         let angle = Double.pi / 30 * Double(i - 15)
         let markerLength = (i % 5 == 0) ? radius * 0.05 : radius * 0.02
-        let strokeWidth: CGFloat = (i % 5 == 0) ? 2 : 1
+        let strokeWidth: CGFloat = (i % 5 == 0) ? 0.7 : 0.3
         
         // Skip markers in subdial area (bottom section)
         if i >= 25 && i <= 35 { continue }
@@ -269,7 +274,7 @@ private func drawSubdialSecondHand(context: GraphicsContext, center: CGPoint, ra
     handContext.stroke(
         mainPath,
         with: .color(subdialHandColor),
-        style: StrokeStyle(lineWidth: 1.5, lineCap: .round)
+        style: StrokeStyle(lineWidth: 0.7, lineCap: .round)
     )
     
     // Counterbalance pointing down
@@ -280,7 +285,7 @@ private func drawSubdialSecondHand(context: GraphicsContext, center: CGPoint, ra
     handContext.stroke(
         counterPath,
         with: .color(subdialHandColor),
-        style: StrokeStyle(lineWidth: 1.5, lineCap: .round)
+        style: StrokeStyle(lineWidth: 0.7, lineCap: .round)
     )
 }
 
@@ -303,3 +308,4 @@ struct HorologiaRomanum_Previews: PreviewProvider {
             .background(Color.black)
     }
 }
+

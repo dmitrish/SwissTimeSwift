@@ -93,7 +93,7 @@ private func drawClockFace(context: GraphicsContext, center: CGPoint, radius: CG
             x: center.x + cos(angle) * outerRadius,
             y: center.y + sin(angle) * outerRadius
         ))
-        context.stroke(path, with: .color(clockBorderColor), lineWidth: 2)
+        context.stroke(path, with: .color(clockBorderColor), lineWidth: 1)
     }
     
     // Main face
@@ -140,7 +140,7 @@ private func drawHourMarkersAndNumbers(context: GraphicsContext, center: CGPoint
                 x: center.x + CGFloat(cos(minuteAngle)) * outerRadius,
                 y: center.y + CGFloat(sin(minuteAngle)) * outerRadius
             ))
-            context.stroke(path, with: .color(markersColor), lineWidth: 1)
+            context.stroke(path, with: .color(markersColor), lineWidth: 0.5)
         }
     }
 }
@@ -159,7 +159,7 @@ private func drawGuillochePattern(context: GraphicsContext, center: CGPoint, rad
             width: currentRadius * 2,
             height: currentRadius * 2
         ))
-        context.stroke(circle, with: .color(Color(hex: "EEEEE0")), lineWidth: 0.5)
+        context.stroke(circle, with: .color(Color(hex: "EEEEE0")), lineWidth: 0.3)
     }
     
     // Cross-hatching
@@ -257,7 +257,7 @@ private func drawClockHands(
     
     context.translateBy(x: center.x, y: center.y)
     context.rotate(by: Angle(radians: secondAngle))
-    context.stroke(secondPath, with: .color(secondHandColor), style: StrokeStyle(lineWidth: 1, lineCap: .round))
+    context.stroke(secondPath, with: .color(secondHandColor), style: StrokeStyle(lineWidth: 0.7, lineCap: .round))
     
     // Counterbalance
     let counterbalance = Path(ellipseIn: CGRect(
