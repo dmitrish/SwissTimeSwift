@@ -1,6 +1,4 @@
 
-
-
 import SwiftUI
 
 struct JurgsenZenithor: View {
@@ -50,120 +48,77 @@ struct JurgsenZenithor: View {
     }
 }
 
-// MARK: - Colors (inspired by dive watches)
+// MARK: - Colors (cleaner dive-inspired look)
 
 private let clockFaceColor = Color.black                                    // Deep black dial
-private let clockBorderColor = Color(red: 0.188, green: 0.188, blue: 0.188) // Dark gray border
-private let bezelColor = Color(red: 0.0, green: 0.0, blue: 0.502)          // Navy blue bezel
-private let bezelMarkersColor = Color.white                                  // White bezel markers
+private let bezelColor = Color(red: 0.0, green: 0.0, blue: 0.502)           // Navy blue — outer border only
 private let hourHandColor = Color.white                                      // White hour hand
 private let minuteHandColor = Color.white                                    // White minute hand
-private let secondHandColor = Color(red: 1.0, green: 0.271, blue: 0.0)     // Orange-red second hand
+private let secondHandColor = Color(red: 1.0, green: 0.271, blue: 0.0)       // Orange-red second hand
 private let markersColor = Color.white                                       // White markers
-private let lumeColor = Color(red: 0.565, green: 0.933, blue: 0.565)       // Light green lume
+private let lumeColor = Color(red: 0.565, green: 0.933, blue: 0.565)         // Light green lume
 private let centerDotColor = Color.white                                     // White center dot
+
+// MARK: - Border width (points)
+private let outerBorderWidth: CGFloat = 4 // 4pt
 
 // MARK: - Drawing Functions
 
 private func drawClockFace(context: GraphicsContext, center: CGPoint, radius: CGFloat) {
-    // Draw outer circle (border)
+    // Inside edge of the outer stroke
+    let faceRadius = radius - outerBorderWidth / 2
+
+    // 1) Draw the dial first so the border sits on top — eliminates any gap
+    let dialRadius = faceRadius // no inset
+    let dial = Path(ellipseIn: CGRect(
+        x: center.x - dialRadius,
+        y: center.y - dialRadius,
+        width: dialRadius * 2,
+        height: dialRadius * 2
+    ))
+    context.fill(dial, with: .color(clockFaceColor))
+
+    // 2) Thin outer border (blue) drawn last
     let outerCircle = Path(ellipseIn: CGRect(
         x: center.x - radius,
         y: center.y - radius,
         width: radius * 2,
         height: radius * 2
     ))
-    context.stroke(outerCircle, with: .color(clockBorderColor), lineWidth: 8)
-    
-    // Draw rotating bezel (characteristic of dive watches)
-    let bezelCircle = Path(ellipseIn: CGRect(
-        x: center.x - radius * 0.95,
-        y: center.y - radius * 0.95,
-        width: radius * 1.9,
-        height: radius * 1.9
-    ))
-    context.fill(bezelCircle, with: .color(bezelColor))
-    
-    // Draw bezel markers (minute markers for diving)
-    for i in 0..<60 {
-        let angle = Double.pi * 2 * Double(i) / 60
-        
-        if i % 5 == 0 {
-            // Draw larger markers at 5-minute intervals
-            let markerLength = (i == 0) ? radius * 0.08 : radius * 0.06
-            let markerEnd = radius * 0.95
-            
-            let endX = center.x + CGFloat(cos(angle)) * markerEnd
-            let endY = center.y + CGFloat(sin(angle)) * markerEnd
-            
-            // Draw triangle at 12 o'clock (0 minutes)
-            if i == 0 {
-                let lumeMarker = Path(ellipseIn: CGRect(
-                    x: endX - radius * 0.03,
-                    y: endY - radius * 0.03,
-                    width: radius * 0.06,
-                    height: radius * 0.06
-                ))
-                context.fill(lumeMarker, with: .color(lumeColor))
-            } else {
-                // Draw dot markers for other 5-minute intervals
-                let dotMarker = Path(ellipseIn: CGRect(
-                    x: endX - radius * 0.02,
-                    y: endY - radius * 0.02,
-                    width: radius * 0.04,
-                    height: radius * 0.04
-                ))
-                context.fill(dotMarker, with: .color(bezelMarkersColor))
-            }
-        } else {
-            // Draw smaller markers for minutes
-            let dotX = center.x + CGFloat(cos(angle)) * radius * 0.95
-            let dotY = center.y + CGFloat(sin(angle)) * radius * 0.95
-            
-            let smallDot = Path(ellipseIn: CGRect(
-                x: dotX - radius * 0.005,
-                y: dotY - radius * 0.005,
-                width: radius * 0.01,
-                height: radius * 0.01
-            ))
-            context.fill(smallDot, with: .color(bezelMarkersColor))
-        }
-    }
-    
-    // Draw inner circle (face)
-    let innerCircle = Path(ellipseIn: CGRect(
-        x: center.x - radius * 0.85,
-        y: center.y - radius * 0.85,
-        width: radius * 1.7,
-        height: radius * 1.7
-    ))
-    context.fill(innerCircle, with: .color(clockFaceColor))
-    
-    // Draw logo text
-    let logoText = Text("Zénithor")
-        .font(.system(size: radius * 0.12, weight: .bold))
-        .foregroundColor(.white)
-    
-    context.draw(logoText, at: CGPoint(x: center.x, y: center.y - radius * 0.3))
-    
-    // Draw "JÜRGSEN GENÈVE" text
-    let modelText = Text("JÜRGSEN GENÈVE")
-        .font(.system(size: radius * 0.08, weight: .regular))
-        .foregroundColor(.white)
-    
-    context.draw(modelText, at: CGPoint(x: center.x, y: center.y + radius * 0.3))
+    context.stroke(outerCircle, with: .color(bezelColor), lineWidth: outerBorderWidth)
+
+    // Branding text, scaled to the expanded inner radius
+    context.draw(
+        Text("Zénithor")
+            .font(.system(size: dialRadius * 0.14, weight: .bold))
+            .foregroundColor(.white),
+        at: CGPoint(x: center.x, y: center.y - dialRadius * 0.34)
+    )
+
+    context.draw(
+        Text("JÜRGSEN GENÈVE")
+            .font(.system(size: dialRadius * 0.095, weight: .regular))
+            .foregroundColor(.white),
+        at: CGPoint(x: center.x, y: center.y + dialRadius * 0.34)
+    )
 }
 
 private func drawHourMarkersAndNumbers(context: GraphicsContext, center: CGPoint, radius: CGFloat) {
-    // Large, luminous hour markers (dive watch style)
+    // Base all geometry from the expanded dial (no inset)
+    let faceRadius = radius - outerBorderWidth / 2
+    let dialRadius = faceRadius
+
+    // Move the marker ring outward to occupy more of the dial
+    let markerRingRadius = dialRadius * 0.8
+
+    // Large, luminous hour markers
     for i in 1...12 {
         let angle = Double.pi / 6 * Double(i - 3)
-        
-        // Draw circular hour markers with lume
-        let markerRadius = (i % 3 == 0) ? radius * 0.06 : radius * 0.05
-        let markerX = center.x + CGFloat(cos(angle)) * radius * 0.7
-        let markerY = center.y + CGFloat(sin(angle)) * radius * 0.7
-        
+
+        let markerRadius = (i % 3 == 0) ? dialRadius * 0.065 : dialRadius * 0.055
+        let markerX = center.x + CGFloat(cos(angle)) * markerRingRadius
+        let markerY = center.y + CGFloat(sin(angle)) * markerRingRadius
+
         // White outer circle
         let outerMarker = Path(ellipseIn: CGRect(
             x: markerX - markerRadius,
@@ -172,8 +127,8 @@ private func drawHourMarkersAndNumbers(context: GraphicsContext, center: CGPoint
             height: markerRadius * 2
         ))
         context.fill(outerMarker, with: .color(markersColor))
-        
-        // Lume inner circle (slightly smaller)
+
+        // Lume inner circle
         let innerMarker = Path(ellipseIn: CGRect(
             x: markerX - markerRadius * 0.8,
             y: markerY - markerRadius * 0.8,
@@ -181,50 +136,56 @@ private func drawHourMarkersAndNumbers(context: GraphicsContext, center: CGPoint
             height: markerRadius * 1.6
         ))
         context.fill(innerMarker, with: .color(lumeColor))
-        
+
         // Special rectangular marker at 12 o'clock
         if i == 12 {
+            let rectSize = dialRadius * 0.13
+            let rectInset = dialRadius * 0.065
             let rect12 = Path(roundedRect: CGRect(
-                x: center.x - radius * 0.06,
-                y: center.y - radius * 0.7 - radius * 0.06,
-                width: radius * 0.12,
-                height: radius * 0.12
+                x: center.x - rectInset,
+                y: center.y - markerRingRadius - rectInset,
+                width: rectSize,
+                height: rectSize
             ), cornerRadius: 0)
             context.fill(rect12, with: .color(markersColor))
-            
+
             // Lume inside
+            let lumeSize = dialRadius * 0.11
+            let lumeInset = dialRadius * 0.055
             let lumeRect = Path(roundedRect: CGRect(
-                x: center.x - radius * 0.05,
-                y: center.y - radius * 0.7 - radius * 0.05,
-                width: radius * 0.1,
-                height: radius * 0.1
+                x: center.x - lumeInset,
+                y: center.y - markerRingRadius - lumeInset,
+                width: lumeSize,
+                height: lumeSize
             ), cornerRadius: 0)
             context.fill(lumeRect, with: .color(lumeColor))
         }
     }
-    
-    // Draw date window at 4:30 position
-    let dateAngle = Double.pi / 6 * 4.5 // Between 4 and 5
-    let dateX = center.x + CGFloat(cos(dateAngle)) * radius * 0.55
-    let dateY = center.y + CGFloat(sin(dateAngle)) * radius * 0.55
-    
-    // White date window
+
+    // Date window at ~4:30 position, pushed outward slightly
+    let dateAngle = Double.pi / 6 * 4.5
+    let dateRingRadius = dialRadius * 0.6
+    let dateX = center.x + CGFloat(cos(dateAngle)) * dateRingRadius
+    let dateY = center.y + CGFloat(sin(dateAngle)) * dateRingRadius
+
+    let dateW = dialRadius * 0.18
+    let dateH = dialRadius * 0.135
     let dateWindow = Path(roundedRect: CGRect(
-        x: dateX - radius * 0.08,
-        y: dateY - radius * 0.06,
-        width: radius * 0.16,
-        height: radius * 0.12
+        x: dateX - dateW / 2,
+        y: dateY - dateH / 2,
+        width: dateW,
+        height: dateH
     ), cornerRadius: 2)
     context.fill(dateWindow, with: .color(.white))
-    
+
     // Date text
     let calendar = Calendar.current
     let day = calendar.component(.day, from: Date())
-    
+
     let dateText = Text("\(day)")
-        .font(.system(size: radius * 0.1, weight: .bold))
+        .font(.system(size: dialRadius * 0.11, weight: .bold))
         .foregroundColor(.black)
-    
+
     context.draw(dateText, at: CGPoint(x: dateX, y: dateY))
 }
 
@@ -236,93 +197,94 @@ private func drawClockHands(
     minuteAngle: Double,
     secondAngle: Double
 ) {
-    // Hour hand - broad sword-shaped with lume
+    let faceRadius = radius - outerBorderWidth / 2
+    let dialRadius = faceRadius // no inset
+
+    // Hour hand - broad sword with lume
     var hourContext = context
     hourContext.translateBy(x: center.x, y: center.y)
     hourContext.rotate(by: .degrees(hourAngle))
-    
-    // Main hour hand
+
     let hourHand = Path(roundedRect: CGRect(
-        x: -radius * 0.04,
-        y: -radius * 0.5,
-        width: radius * 0.08,
-        height: radius * 0.5
-    ), cornerRadius: radius * 0.02)
+        x: -dialRadius * 0.045,
+        y: -dialRadius * 0.52,
+        width: dialRadius * 0.09,
+        height: dialRadius * 0.52
+    ), cornerRadius: dialRadius * 0.022)
     hourContext.fill(hourHand, with: .color(hourHandColor))
-    
-    // Lume on hour hand
+
     let hourLume = Path(roundedRect: CGRect(
-        x: -radius * 0.03,
-        y: -radius * 0.48,
-        width: radius * 0.06,
-        height: radius * 0.4
-    ), cornerRadius: radius * 0.015)
+        x: -dialRadius * 0.034,
+        y: -dialRadius * 0.50,
+        width: dialRadius * 0.068,
+        height: dialRadius * 0.43
+    ), cornerRadius: dialRadius * 0.016)
     hourContext.fill(hourLume, with: .color(lumeColor))
-    
-    // Minute hand - longer sword-shaped with lume
+
+    // Minute hand - longer sword with lume
     var minuteContext = context
     minuteContext.translateBy(x: center.x, y: center.y)
     minuteContext.rotate(by: .degrees(minuteAngle))
-    
-    // Main minute hand
+
     let minuteHand = Path(roundedRect: CGRect(
-        x: -radius * 0.03,
-        y: -radius * 0.7,
-        width: radius * 0.06,
-        height: radius * 0.7
-    ), cornerRadius: radius * 0.015)
+        x: -dialRadius * 0.034,
+        y: -dialRadius * 0.75,
+        width: dialRadius * 0.068,
+        height: dialRadius * 0.75
+    ), cornerRadius: dialRadius * 0.016)
     minuteContext.fill(minuteHand, with: .color(minuteHandColor))
-    
-    // Lume on minute hand
+
     let minuteLume = Path(roundedRect: CGRect(
-        x: -radius * 0.02,
-        y: -radius * 0.68,
-        width: radius * 0.04,
-        height: radius * 0.6
-    ), cornerRadius: radius * 0.01)
+        x: -dialRadius * 0.024,
+        y: -dialRadius * 0.72,
+        width: dialRadius * 0.048,
+        height: dialRadius * 0.64
+    ), cornerRadius: dialRadius * 0.011)
     minuteContext.fill(minuteLume, with: .color(lumeColor))
-    
-    // Second hand - thin with distinctive circle near tip
+
+    // Second hand - thin with circle near tip
     var secondContext = context
     secondContext.translateBy(x: center.x, y: center.y)
     secondContext.rotate(by: .degrees(secondAngle))
-    
-    // Main second hand
+
     var secondPath = Path()
-    secondPath.move(to: CGPoint(x: 0, y: radius * 0.15))
-    secondPath.addLine(to: CGPoint(x: 0, y: -radius * 0.75))
-    
+    secondPath.move(to: CGPoint(x: 0, y: dialRadius * 0.16))
+    secondPath.addLine(to: CGPoint(x: 0, y: -dialRadius * 0.80))
+
     secondContext.stroke(
         secondPath,
         with: .color(secondHandColor),
         style: StrokeStyle(lineWidth: 2, lineCap: .round)
     )
-    
+
     // Distinctive circle near tip
     let tipCircle = Path(ellipseIn: CGRect(
-        x: -radius * 0.04,
-        y: -radius * 0.6 - radius * 0.04,
-        width: radius * 0.08,
-        height: radius * 0.08
+        x: -dialRadius * 0.042,
+        y: -dialRadius * 0.64 - dialRadius * 0.042,
+        width: dialRadius * 0.084,
+        height: dialRadius * 0.084
     ))
     secondContext.fill(tipCircle, with: .color(secondHandColor))
-    
+
     // Counterbalance
     let counterbalance = Path(ellipseIn: CGRect(
-        x: -radius * 0.03,
-        y: radius * 0.1 - radius * 0.03,
-        width: radius * 0.06,
-        height: radius * 0.06
+        x: -dialRadius * 0.032,
+        y: dialRadius * 0.11 - dialRadius * 0.032,
+        width: dialRadius * 0.064,
+        height: dialRadius * 0.064
     ))
     secondContext.fill(counterbalance, with: .color(secondHandColor))
 }
 
 private func drawCenterDot(context: GraphicsContext, center: CGPoint, radius: CGFloat) {
+    let faceRadius = radius - outerBorderWidth / 2
+    let dialRadius = faceRadius // no inset
+
     let centerDot = Path(ellipseIn: CGRect(
-        x: center.x - radius * 0.04,
-        y: center.y - radius * 0.04,
-        width: radius * 0.08,
-        height: radius * 0.08
+        x: center.x - dialRadius * 0.042,
+        y: center.y - dialRadius * 0.042,
+        width: dialRadius * 0.084,
+        height: dialRadius * 0.084
     ))
     context.fill(centerDot, with: .color(centerDotColor))
 }
