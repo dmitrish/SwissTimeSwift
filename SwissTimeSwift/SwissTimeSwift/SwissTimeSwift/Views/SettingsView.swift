@@ -10,104 +10,110 @@ struct SettingsView: View {
     @State private var showingTimeZonePicker = false
     
     var body: some View {
-        NavigationView {
-            Form {
-                // Theme section
-                Section("Appearance") {
-                    Picker("Theme", selection: $themeViewModel.themeMode) {
-                        ForEach(AppSettings.ThemeMode.allCases, id: \.self) { theme in
-                            Text(theme.displayName).tag(theme)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                }
-                
-                // Time format section
-                Section("Time Format") {
-                    Toggle("Use US Time Format (12-hour)", isOn: $useUSTimeFormat)
-                        .onChange(of: useUSTimeFormat) { newValue in
-                            AppSettings.useUSTimeFormat = newValue
-                        }
-                    
-                    HStack {
-                        Text("Example")
-                        Spacer()
-                        Text(useUSTimeFormat ? "3:45 PM" : "15:45")
-                            .foregroundColor(.secondary)
+        Form {
+            // Theme section
+            Section("Appearance") {
+                Picker("Theme", selection: $themeViewModel.themeMode) {
+                    ForEach(AppSettings.ThemeMode.allCases, id: \.self) { theme in
+                        Text(theme.displayName).tag(theme)
                     }
                 }
-                
-                // Time zone section
-                Section("Time Zone") {
-                    Button(action: { showingTimeZonePicker = true }) {
-                        HStack {
-                            Text("Selected Time Zone")
-                            Spacer()
-                            Text(timeZoneViewModel.selectedTimeZone.localizedName(for: .standard, locale: .current) ?? timeZoneViewModel.selectedTimeZone.identifier)
-                                .foregroundColor(.secondary)
-                            Image(systemName: "chevron.right")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
+                .pickerStyle(.segmented)
+            }
+            .listRowBackground(Color.clear)
+            
+            // Time format section
+            Section("Time Format") {
+                Toggle("Use US Time Format (12-hour)", isOn: $useUSTimeFormat)
+                    .onChange(of: useUSTimeFormat) { newValue in
+                        AppSettings.useUSTimeFormat = newValue
                     }
-                    .foregroundColor(.primary)
-                    
-                    HStack {
-                        Text("Current Time")
-                        Spacer()
-                        Text(timeZoneViewModel.getFormattedTime(useUSFormat: useUSTimeFormat))
-                            .foregroundColor(.secondary)
-                    }
-                }
                 
-                // Watch interaction section
-                Section("Watch Interaction") {
-                    Toggle("Double-tap to remove watches", isOn: $useDoubleTapForRemoval)
-                        .onChange(of: useDoubleTapForRemoval) { newValue in
-                            AppSettings.useDoubleTapForRemoval = newValue
-                        }
-                    
-                    Text(useDoubleTapForRemoval ? "Double-tap watches to remove them from your collection" : "Long-press watches to remove them from your collection")
-                        .font(.caption)
+                HStack {
+                    Text("Example")
+                    Spacer()
+                    Text(useUSTimeFormat ? "3:45 PM" : "15:45")
                         .foregroundColor(.secondary)
                 }
-                
-                // App info section
-                Section("About") {
-                    NavigationLink(destination: AboutView()) {
-                        HStack {
-                            Image(systemName: "info.circle")
-                            Text("About Swiss Time")
-                        }
-                    }
-                    
+            }
+            .listRowBackground(Color.clear)
+            
+            // Time zone section
+            Section("Time Zone") {
+                Button(action: { showingTimeZonePicker = true }) {
                     HStack {
-                        Image(systemName: "star")
-                        Text("Rate App")
-                    }
-                    .onTapGesture {
-                        // TODO: Open App Store rating
-                    }
-                    
-                    HStack {
-                        Image(systemName: "envelope")
-                        Text("Contact Support")
-                    }
-                    .onTapGesture {
-                        // TODO: Open email composer
+                        Text("Selected Time Zone")
+                        Spacer()
+                        Text(timeZoneViewModel.selectedTimeZone.localizedName(for: .standard, locale: .current) ?? timeZoneViewModel.selectedTimeZone.identifier)
+                            .foregroundColor(.secondary)
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
                 }
+                .foregroundColor(.primary)
                 
-                // Data management section
-                Section("Data") {
-                    Button("Reset All Settings") {
-                        // TODO: Show confirmation dialog
-                    }
-                    .foregroundColor(.red)
+                HStack {
+                    Text("Current Time")
+                    Spacer()
+                    Text(timeZoneViewModel.getFormattedTime(useUSFormat: useUSTimeFormat))
+                        .foregroundColor(.secondary)
                 }
             }
+            .listRowBackground(Color.clear)
+            
+            // Watch interaction section
+            Section("Watch Interaction") {
+                Toggle("Double-tap to remove watches", isOn: $useDoubleTapForRemoval)
+                    .onChange(of: useDoubleTapForRemoval) { newValue in
+                        AppSettings.useDoubleTapForRemoval = newValue
+                    }
+                
+                Text(useDoubleTapForRemoval ? "Double-tap watches to remove them from your collection" : "Long-press watches to remove them from your collection")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .listRowBackground(Color.clear)
+            
+            // App info section
+            Section("About") {
+                NavigationLink(destination: AboutView()) {
+                    HStack {
+                        Image(systemName: "info.circle")
+                        Text("About Swiss Time")
+                    }
+                }
+                
+                HStack {
+                    Image(systemName: "star")
+                    Text("Rate App")
+                }
+                .onTapGesture {
+                    // TODO: Open App Store rating
+                }
+                
+                HStack {
+                    Image(systemName: "envelope")
+                    Text("Contact Support")
+                }
+                .onTapGesture {
+                    // TODO: Open email composer
+                }
+            }
+            .listRowBackground(Color.clear)
+            
+            // Data management section
+            Section("Data") {
+                Button("Reset All Settings") {
+                    // TODO: Show confirmation dialog
+                }
+                .foregroundColor(.red)
+            }
+            .listRowBackground(Color.clear)
         }
         .navigationTitle("Settings")
+        .scrollContentBackground(.hidden)
+        .appBackground()
         .sheet(isPresented: $showingTimeZonePicker) {
             TimeZonePickerView(selectedTimeZone: $timeZoneViewModel.selectedTimeZone)
         }

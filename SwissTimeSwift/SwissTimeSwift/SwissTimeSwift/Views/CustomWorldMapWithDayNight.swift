@@ -24,7 +24,8 @@ struct CustomWorldMapWithDayNight: View {
     let specExp: CGFloat = 4.0
     
     init(
-        nightOverlayColor: Color = Color(red: 0.07, green: 0.13, blue: 0.20),
+        // Color(red: 0.07, green: 0.13, blue: 0.20),
+        nightOverlayColor: Color = .appPrimary,
         updateIntervalMillis: TimeInterval = 6.0,
         pixelDensity: CGFloat? = nil
     ) {

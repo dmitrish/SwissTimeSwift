@@ -59,6 +59,9 @@ import SwiftUI
              .tag(3)
          }
          .preferredColorScheme(themeViewModel.colorScheme)
+         .frame(maxWidth: .infinity, maxHeight: .infinity)
+         .background(Color("SwissTimePrimary"))
+         .ignoresSafeArea() // Important! Extends to edges
      }
  }
 
