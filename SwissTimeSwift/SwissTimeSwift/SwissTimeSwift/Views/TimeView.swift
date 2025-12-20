@@ -28,6 +28,7 @@ struct TimeView: View {
                 }
             }
         }
+        .appBackground()
         .navigationTitle("Swiss Time")
         .navigationBarTitleDisplayMode(.inline)
         .onReceive(timer) { _ in
