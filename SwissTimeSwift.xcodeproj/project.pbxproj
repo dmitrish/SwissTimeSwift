@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		0FD017182F0330FE000555CA /* readme.md in Resources */ = {isa = PBXBuildFile; fileRef = 0FD017172F0330F5000555CA /* readme.md */; };
+		0FD0171A2F03311F000555CA /* File.txt in Resources */ = {isa = PBXBuildFile; fileRef = 0FD017192F03311F000555CA /* File.txt */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		0F4BC5E92EEBBFF800176BE9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +32,8 @@
 		0F4BC5DB2EEBBFF700176BE9 /* SwissTimeSwift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwissTimeSwift.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0F4BC5E82EEBBFF800176BE9 /* SwissTimeSwiftTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwissTimeSwiftTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0F4BC5F22EEBBFF800176BE9 /* SwissTimeSwiftUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwissTimeSwiftUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0FD017172F0330F5000555CA /* readme.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = readme.md; sourceTree = "<group>"; };
+		0FD017192F03311F000555CA /* File.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = File.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -80,6 +87,8 @@
 		0F4BC5D22EEBBFF700176BE9 = {
 			isa = PBXGroup;
 			children = (
+				0FD017172F0330F5000555CA /* readme.md */,
+				0FD017192F03311F000555CA /* File.txt */,
 				0FD017142F033000000555CA /* docs */,
 				0F4BC5DD2EEBBFF700176BE9 /* SwissTimeSwift */,
 				0F4BC5EB2EEBBFF800176BE9 /* SwissTimeSwiftTests */,
@@ -219,6 +228,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0FD017182F0330FE000555CA /* readme.md in Resources */,
+				0FD0171A2F03311F000555CA /* File.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
