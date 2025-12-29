@@ -45,6 +45,11 @@
 			path = SwissTimeSwiftUITests;
 			sourceTree = "<group>";
 		};
+		0FD017142F033000000555CA /* docs */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = docs;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +80,7 @@
 		0F4BC5D22EEBBFF700176BE9 = {
 			isa = PBXGroup;
 			children = (
+				0FD017142F033000000555CA /* docs */,
 				0F4BC5DD2EEBBFF700176BE9 /* SwissTimeSwift */,
 				0F4BC5EB2EEBBFF800176BE9 /* SwissTimeSwiftTests */,
 				0F4BC5F52EEBBFF800176BE9 /* SwissTimeSwiftUITests */,
@@ -109,6 +115,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				0F4BC5DD2EEBBFF700176BE9 /* SwissTimeSwift */,
+				0FD017142F033000000555CA /* docs */,
 			);
 			name = SwissTimeSwift;
 			packageProductDependencies = (
