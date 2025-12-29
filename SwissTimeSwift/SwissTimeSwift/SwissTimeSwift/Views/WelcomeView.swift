@@ -95,8 +95,9 @@ struct WelcomeView: View {
                 }
             }
         }
+        .appBackground()  // Add this line
         .navigationTitle("Welcome")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar(.hidden, for: .tabBar) // Add this line to hide the tab bar
+        .toolbar(.hidden, for: .tabBar)
     }
 }
