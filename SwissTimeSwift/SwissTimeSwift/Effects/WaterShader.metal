@@ -54,6 +54,8 @@ using namespace metal;
         float envelope = exp(-abs(radialDist) * 0.02); // Gentle falloff
         waveValue *= envelope;
         
+        waveValue *= 2.0;
+        
         // Direction vector
         float2 direction = diff / distance;
         
