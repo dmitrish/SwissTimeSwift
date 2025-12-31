@@ -16,12 +16,12 @@ World Clock with timezones is a mighty little app that adds fun to timekeeping. 
   </tr>
   <table style="width:100%">
   <tr>
-      <th>Water Shader Effect</th>
-      <th>Time Screen</th>
+      <th>Water Shader Effects</th>
+      <th>Water Shader Effects</th>
   </tr>
   <tr>
 <td style="width:50%"><img src="https://github.com/dmitrish/SwissTimeSwift/blob/main/docs/iosWaterShader.gif"/></td>
-    <td style="width:50%"><img src="https://github.com/dmitrish/SwissTimeSwift/blob/main/docs/swisstimeswift-timescreen.gif"/></td>
+    <td style="width:50%"><img src="https://github.com/dmitrish/SwissTimeSwift/blob/main/docs/iosWaterShader2.gif"/></td>
 \    
   
   </tr>
