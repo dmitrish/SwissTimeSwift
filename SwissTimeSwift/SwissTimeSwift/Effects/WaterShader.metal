@@ -51,10 +51,10 @@ using namespace metal;
         
         // Add envelope to make wave more visible near the front
         // This creates a visible "ring" effect
-        float envelope = exp(-abs(radialDist) * 0.02); // Gentle falloff
+        float envelope = exp(-abs(radialDist) * 0.04); // Gentle falloff
         waveValue *= envelope;
         
-        waveValue *= 2.0;
+        waveValue *= 1.5;
         
         // Direction vector
         float2 direction = diff / distance;
