@@ -46,7 +46,7 @@ struct WatchListView: View {
             ScrollView {
                 LazyVStack(spacing: 0) {
                     ForEach(filteredWatches) { watch in
-                        WatchListRow(
+                        WatchListRowContent(
                             watch: watch,
                             isSelected: watchViewModel.isWatchSelected(watch),
                             onToggleSelection: {
@@ -84,49 +84,57 @@ struct WatchListView: View {
     }
 }
 
-// MARK: - Watch List Row (Android-style)
-struct WatchListRow: View {
+// MARK: - Watch List Row Content
+struct WatchListRowContent: View {
     let watch: WatchInfo
     let isSelected: Bool
     let onToggleSelection: () -> Void
     
     var body: some View {
-        Button(action: onToggleSelection) {
-            HStack(alignment: .top, spacing: 16) {
-                // Watch face preview (left side) - no background
-                WatchFaceView(
-                    watch: watch,
-                    timeZone: TimeZone.current,
-                    size: 70
-                )
-                
-                // Watch info (center)
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(watch.name)
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.white)
-                        .lineLimit(1)
+        HStack(alignment: .top, spacing: 16) {
+            // Tappable area for navigation (watch face + info)
+            NavigationLink(destination: WatchDetailView(watch: watch)) {
+                HStack(alignment: .top, spacing: 16) {
+                    // Watch face preview (left side) - no background
+                    WatchFaceView(
+                        watch: watch,
+                        timeZone: TimeZone.current,
+                        size: 70
+                    )
                     
-                    Text(watch.description)
-                        .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.7))
-                        .lineLimit(4)
-                        .multilineTextAlignment(.leading)
+                    // Watch info (center)
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(watch.name)
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.white)
+                            .lineLimit(1)
+                        
+                        Text(watch.description)
+                            .font(.subheadline)
+                            .foregroundColor(.white.opacity(0.7))
+                            .lineLimit(4)
+                            .multilineTextAlignment(.leading)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                
-                // Selection icon (right side)
+            }
+            .buttonStyle(.plain)
+            
+            // Selection icon (right side) - separate tap target
+            Button(action: onToggleSelection) {
                 Image(systemName: isSelected ? "checkmark" : "arrow.up.right")
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(isSelected ? .white : .white.opacity(0.5))
-                    .frame(width: 24, height: 24)
-                    .padding(.top, 4)
+                    .frame(width: 44, height: 44) // Larger tap target
+                    .contentShape(Rectangle())
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 16)
+            .buttonStyle(.plain)
+            .padding(.top, 4)
         }
-        .buttonStyle(.plain)
+        .padding(.leading, 20)
+        .padding(.trailing, 12)
+        .padding(.vertical, 16)
     }
 }
 
