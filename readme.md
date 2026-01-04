@@ -22,9 +22,9 @@ World Clock with timezones is a mighty little app that adds fun to timekeeping. 
       <th>Watch List Screen</th>
   </tr>
   <tr>
-<td style="width:50%"><img src="https://github.com/dmitrish/SwissTimeSwift/blob/main/docs/iosWaterShader.gif"/></td>
-    <td style="width:50%"><img src="https://github.com/dmitrish/SwissTimeSwift/blob/main/docs/iosWaterShader2.gif"/></td>
-    <td style="width:50%"><img src="https://github.com/dmitrish/SwissTimeSwift/blob/main/docs/watchlist.png"/></td>
+<td style="width:33%"><img src="https://github.com/dmitrish/SwissTimeSwift/blob/main/docs/iosWaterShader.gif"/></td>
+    <td style="width:33%"><img src="https://github.com/dmitrish/SwissTimeSwift/blob/main/docs/iosWaterShader2.gif"/></td>
+    <td style="width:33%"><img src="https://github.com/dmitrish/SwissTimeSwift/blob/main/docs/watchlist.png"/></td>
   
   </tr>
   
