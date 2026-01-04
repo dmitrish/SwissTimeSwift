@@ -12,15 +12,15 @@ World Clock with timezones is a mighty little app that adds fun to timekeeping. 
   <tr>
     <td style="vertical-align:top; text-align:center; padding:10px;">
       <img src="https://raw.githubusercontent.com/dmitrish/SwissTimeSwift/main/docs/swisstimeswift-timescreen.gif" 
-           style="height:600px; width:auto;"/>
+           style="height:500px; width:auto;"/>
     </td>
     <td style="vertical-align:top; text-align:center; padding:10px;">
       <img src="https://raw.githubusercontent.com/dmitrish/SwissTimeSwift/main/docs/watchlist.png" 
-           style="height:600px; width:auto;"/>
+           style="height:500px; width:auto;"/>
     </td>
         <td style="vertical-align:top; text-align:center; padding:10px;">
       <img src="https://raw.githubusercontent.com/dmitrish/SwissTimeSwift/main/docs/iosdetailscreen.gif" 
-           style="height:600px; width:auto;"/>
+           style="height:500px; width:auto;"/>
     </td>
   </tr>
 </table>
