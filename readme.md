@@ -9,13 +9,13 @@ World Clock with timezones is a mighty little app that adds fun to timekeeping. 
     <th>Watch List Screen</th>
   </tr>
   <tr>
-    <td style="width:50%; vertical-align:top">
+    <td style="width:50%; height:400px; vertical-align:top">
       <img src="https://github.com/dmitrish/SwissTimeSwift/blob/main/docs/swisstimeswift-timescreen.gif" 
-           style="max-height:400px; width:auto; display:block;"/>
+           style="width:100%; height:100%; object-fit:contain;"/>
     </td>
-    <td style="width:50%; vertical-align:top">
+    <td style="width:50%; height:400px; vertical-align:top">
       <img src="https://github.com/dmitrish/SwissTimeSwift/blob/main/docs/watchlist.png" 
-           style="max-height:400px; width:auto; display:block;"/>
+           style="width:100%; height:100%; object-fit:contain;"/>
     </td>
   </tr>
 </table>
