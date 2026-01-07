@@ -9,15 +9,15 @@ struct TimeView: View {
     @State private var currentTime = Date()
     @State private var selectedWatchIndex = 0
     @State private var showingTimeZonePicker = false
-    
+
     // Timer for updating time
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    
-    // Get the use US time format setting
+
+    // Get the use US time format setting - always reads fresh from settings
     private var useUSFormat: Bool {
         AppSettings.useUSTimeFormat
     }
-    
+
     // Current watch being displayed
     private var currentWatch: WatchInfo? {
         guard !watchViewModel.selectedWatches.isEmpty,
@@ -39,8 +39,19 @@ struct TimeView: View {
     private var formattedTime: String {
         let formatter = DateFormatter()
         formatter.timeZone = currentWatchTimeZone
-        formatter.dateFormat = useUSFormat ? "h:mm:ss a" : "HH:mm:ss"
-        return formatter.string(from: currentTime)
+
+        // Force locale to respect the format string
+        if useUSFormat {
+            formatter.locale = Locale(identifier: "en_US_POSIX")
+            formatter.dateFormat = "h:mm:ss a"
+        } else {
+            formatter.locale = Locale(identifier: "en_GB")
+            formatter.dateFormat = "HH:mm:ss"
+        }
+
+        let result = formatter.string(from: currentTime)
+        print("TimeView - useUSFormat: \(useUSFormat), locale: \(formatter.locale?.identifier ?? "nil"), result: \(result)")
+        return result
     }
     
     // Formatted date string for current watch's time zone
@@ -116,7 +127,7 @@ struct TimeView: View {
                     
                     // World map
                     CustomWorldMapWithDayNight()
-                        .padding(.top, 8)
+                        .padding(.top, 40)
                     
                     Spacer(minLength: 0)
                 }

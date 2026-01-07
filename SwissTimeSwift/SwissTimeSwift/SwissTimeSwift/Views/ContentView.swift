@@ -62,6 +62,7 @@ import SwiftUI
          .frame(maxWidth: .infinity, maxHeight: .infinity)
          .background(Color("SwissTimePrimary"))
          .ignoresSafeArea() // Important! Extends to edges
+         .statusBar(hidden: true)
      }
  }
 
