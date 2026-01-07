@@ -90,15 +90,17 @@ struct WatchListRowContent: View {
     let isSelected: Bool
     let onToggleSelection: () -> Void
     
+    @EnvironmentObject var watchViewModel: WatchViewModel
+    
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
             // Tappable area for navigation (watch face + info)
             NavigationLink(destination: WatchDetailView(watch: watch)) {
                 HStack(alignment: .top, spacing: 16) {
-                    // Watch face preview (left side) - no background
+                    // Watch face preview (left side) - uses watch's own time zone
                     WatchFaceView(
                         watch: watch,
-                        timeZone: TimeZone.current,
+                        timeZone: watchViewModel.getTimeZone(for: watch.name),
                         size: 70
                     )
                     

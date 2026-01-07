@@ -3,9 +3,21 @@
 import SwiftUI
 
 struct PontifexChronometra: View {
+    let timeZone: TimeZone
+
     @State private var currentTime = Date()
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    
+
+    init(timeZone: TimeZone = .current) {
+        self.timeZone = timeZone
+    }
+
+    private var calendar: Calendar {
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = timeZone
+        return cal
+    }
+
     var body: some View {
         GeometryReader { geometry in
             let size = min(geometry.size.width, geometry.size.height)
@@ -18,13 +30,12 @@ struct PontifexChronometra: View {
                     drawClockFace(context: context, center: center, radius: radius)
                     drawHourMarkers(context: context, center: center, radius: radius)
                     drawGuilloche(context: context, center: center, radius: radius)
-                    drawDateWindow(context: context, center: center, radius: radius)
+                    drawDateWindow(context: context, center: center, radius: radius, currentTime: currentTime, calendar: calendar)
                     drawLogo(context: context, center: center, radius: radius)
                 }
                 
                 // Animated content
                 Canvas { context, size in
-                    let calendar = Calendar.current
                     let hour = calendar.component(.hour, from: currentTime) % 12
                     let minute = calendar.component(.minute, from: currentTime)
                     let second = calendar.component(.second, from: currentTime)
@@ -190,7 +201,7 @@ private func drawGuilloche(context: GraphicsContext, center: CGPoint, radius: CG
     }
 }
 
-private func drawDateWindow(context: GraphicsContext, center: CGPoint, radius: CGFloat) {
+private func drawDateWindow(context: GraphicsContext, center: CGPoint, radius: CGFloat, currentTime: Date, calendar: Calendar) {
     let dateWindowX = center.x + radius * 0.6
     let dateWindowY = center.y
     let dateWindowWidth = radius * 0.15
@@ -217,8 +228,7 @@ private func drawDateWindow(context: GraphicsContext, center: CGPoint, radius: C
     )
     
     // Date text
-    let calendar = Calendar.current
-    let day = calendar.component(.day, from: Date())
+    let day = calendar.component(.day, from: currentTime)
     
     let dateText = Text("\(day)")
         .font(.system(size: radius * 0.06, weight: .semibold))
