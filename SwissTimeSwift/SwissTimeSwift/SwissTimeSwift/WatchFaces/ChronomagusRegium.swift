@@ -23,7 +23,10 @@ struct ChronomagusRegium: View {
 
                 // Animated content
                 Canvas { context, _ in
-                    let calendar = Calendar.current // If you want to honor `timeZone`, inject a Calendar using it
+                    // Create calendar with injected timezone
+                    var calendar = Calendar(identifier: .gregorian)
+                    calendar.timeZone = timeZone
+
                     let hour = calendar.component(.hour, from: currentTime) % 12
                     let minute = calendar.component(.minute, from: currentTime)
                     let second = calendar.component(.second, from: currentTime)

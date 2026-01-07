@@ -2,8 +2,20 @@
 import SwiftUI
 
 struct JurgsenZenithor: View {
+    let timeZone: TimeZone
+    
     @State private var currentTime = Date()
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    
+    init(timeZone: TimeZone = .current) {
+        self.timeZone = timeZone
+    }
+    
+    private var calendar: Calendar {
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = timeZone
+        return cal
+    }
     
     var body: some View {
         GeometryReader { geometry in
@@ -15,19 +27,18 @@ struct JurgsenZenithor: View {
                 // Static content
                 Canvas { context, size in
                     drawClockFace(context: context, center: center, radius: radius)
-                    drawHourMarkersAndNumbers(context: context, center: center, radius: radius)
+                    drawHourMarkersAndNumbers(context: context, center: center, radius: radius, calendar: calendar, currentTime: currentTime)
                 }
                 
                 // Animated content
                 Canvas { context, size in
-                    let calendar = Calendar.current
                     let hour = calendar.component(.hour, from: currentTime) % 12
                     let minute = calendar.component(.minute, from: currentTime)
                     let second = calendar.component(.second, from: currentTime)
-                    
-                    let hourAngle = Double(hour * 30 + minute) * 0.5
-                    let minuteAngle = Double(minute * 6)
-                    let secondAngle = Double(second * 6)
+
+                    let hourAngle = Double(hour) * 30.0 + Double(minute) * 0.5
+                    let minuteAngle = Double(minute) * 6.0
+                    let secondAngle = Double(second) * 6.0
                     
                     drawClockHands(
                         context: context,
@@ -103,7 +114,7 @@ private func drawClockFace(context: GraphicsContext, center: CGPoint, radius: CG
     )
 }
 
-private func drawHourMarkersAndNumbers(context: GraphicsContext, center: CGPoint, radius: CGFloat) {
+private func drawHourMarkersAndNumbers(context: GraphicsContext, center: CGPoint, radius: CGFloat, calendar: Calendar, currentTime: Date) {
     // Base all geometry from the expanded dial (no inset)
     let faceRadius = radius - outerBorderWidth / 2
     let dialRadius = faceRadius
@@ -178,9 +189,8 @@ private func drawHourMarkersAndNumbers(context: GraphicsContext, center: CGPoint
     ), cornerRadius: 2)
     context.fill(dateWindow, with: .color(.white))
 
-    // Date text
-    let calendar = Calendar.current
-    let day = calendar.component(.day, from: Date())
+    // Date text - use the passed calendar for correct timezone
+    let day = calendar.component(.day, from: currentTime)
 
     let dateText = Text("\(day)")
         .font(.system(size: dialRadius * 0.11, weight: .bold))
@@ -293,7 +303,7 @@ private func drawCenterDot(context: GraphicsContext, center: CGPoint, radius: CG
 
 struct JurgsenZenithor_Previews: PreviewProvider {
     static var previews: some View {
-        JurgsenZenithor()
+        JurgsenZenithor(timeZone: TimeZone(identifier: "Asia/Tokyo")!)
             .frame(width: 300, height: 300)
             .background(Color.black)
     }

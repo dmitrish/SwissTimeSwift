@@ -2,9 +2,21 @@
 import SwiftUI
 
 struct HorologiaRomanum: View {
+    let timeZone: TimeZone
+
     @State private var currentTime = Date()
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    
+
+    init(timeZone: TimeZone = .current) {
+        self.timeZone = timeZone
+    }
+
+    private var calendar: Calendar {
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = timeZone
+        return cal
+    }
+
     var body: some View {
         GeometryReader { geometry in
             let size = min(geometry.size.width, geometry.size.height)
@@ -21,7 +33,6 @@ struct HorologiaRomanum: View {
                 
                 // Animated content
                 Canvas { context, size in
-                    let calendar = Calendar.current
                     let hour = calendar.component(.hour, from: currentTime) % 12
                     let minute = calendar.component(.minute, from: currentTime)
                     let second = calendar.component(.second, from: currentTime)

@@ -66,45 +66,42 @@ struct WatchFaceView: View {
            switch watch.watchFaceType {
            case .valentinianus:
                ValentinianusWatchFace(timeZone: timeZone, size: size)
-           /*case .concordia:
-               ChronomagusRegium()
-               // ConcordiaWatchFace(timeZone: timeZone, size: size)*/
            case .jurgsen:
-               JurgsenZenithor()
+               JurgsenZenithor(timeZone: timeZone)
            case .horologia:
-               HorologiaRomanum()
+               HorologiaRomanum(timeZone: timeZone)
            case .leonard:
-               LeonardAutomaticWatch()
+               LeonardAutomaticWatch(timeZone: timeZone)
            case .yamaNoToki:
-               YamaNoTokiWatch()
+               YamaNoTokiWatch(timeZone: timeZone)
            case .constantinus:
-               ConstantinusAureusChronometerWatch()
+               ConstantinusAureusChronometerWatch(timeZone: timeZone)
            case .romaMarina:
-               RomaMarinaWatch()
+               RomaMarinaWatch(timeZone: timeZone)
            case .kandinsky:
-               KandinskyEvening()
+               KandinskyEvening(timeZone: timeZone)
            case .pontifex:
-               PontifexChronometra()
+               PontifexChronometra(timeZone: timeZone)
            case .knotUrushi:
                KnotUrushi(timeZone: timeZone)
            case .centurio:
-               CenturioLuminor()
+               CenturioLuminor(timeZone: timeZone)
            case .chronomagus:
-               ChronomagusRegium(timeZone: TimeZone(identifier: "Asia/Tokyo")!)
+               ChronomagusRegium(timeZone: timeZone)
            case .aventinus:
-               AventinusClassiqueWatch()
+               AventinusClassiqueWatch(timeZone: timeZone)
            case .lucerna:
-               LucernaRoma()
+               LucernaRoma(timeZone: timeZone)
            case .chantDuTemps:
-               ChantDuTempsWatch()
+               ChantDuTempsWatch(timeZone: timeZone)
            case .edgeOfSecond:
-               EdgeOfSecondWatch()
+               EdgeOfSecondWatch(timeZone: timeZone)
            case .zeitwerk:
-               ZeitwerkWatch(timeZone: TimeZone(identifier: "Asia/Tokyo")!)
+               ZeitwerkWatch(timeZone: timeZone)
            case .vostok:
-               VostokRussianMilitaryWatch()
+               VostokRussianMilitaryWatch(timeZone: timeZone)
            default:
-               VostokRussianMilitaryWatch()
+               VostokRussianMilitaryWatch(timeZone: timeZone)
            }
        }
 
@@ -204,7 +201,8 @@ struct WatchHands: View {
     let size: CGFloat
     
     private var timeComponents: (hour: Int, minute: Int, second: Int) {
-        let calendar = Calendar.current
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = timeZone
         let components = calendar.dateComponents([.hour, .minute, .second], from: time)
         return (
             hour: components.hour ?? 0,

@@ -7,6 +7,9 @@ class WatchViewModel: ObservableObject {
     @Published var selectedWatchesLoaded: Bool = false
     @Published var availableWatches: [WatchInfo] = WatchInfo.allWatches
     
+    // Track per-watch time zones with Published for UI updates
+    @Published private var watchTimeZones: [String: TimeZone] = [:]
+    
     private let watchPreferencesService: WatchPreferencesService
     private let timeZoneService: TimeZoneService
     
@@ -15,6 +18,7 @@ class WatchViewModel: ObservableObject {
         self.watchPreferencesService = watchPreferencesService
         self.timeZoneService = timeZoneService
         loadSelectedWatches()
+        loadWatchTimeZones()
     }
     
     // Load selected watches from persistent storage
@@ -24,6 +28,16 @@ class WatchViewModel: ObservableObject {
             selectedNames.contains(watch.name)
         }
         selectedWatchesLoaded = true
+    }
+    
+    // Load persisted time zones for all watches
+    private func loadWatchTimeZones() {
+        for watch in availableWatches {
+            if let timeZoneId = watchPreferencesService.getWatchTimeZone(watchName: watch.name),
+               let timeZone = TimeZone(identifier: timeZoneId) {
+                watchTimeZones[watch.name] = timeZone
+            }
+        }
     }
     
     // Toggle watch selection (add/remove from favorites)
@@ -76,14 +90,26 @@ class WatchViewModel: ObservableObject {
     
     // Get time zone for specific watch
     func getTimeZone(for watchName: String) -> TimeZone {
-        if let timeZoneId = watchPreferencesService.getWatchTimeZone(watchName: watchName) {
-            return TimeZone(identifier: timeZoneId) ?? TimeZone.current
+        // First check in-memory cache
+        if let timeZone = watchTimeZones[watchName] {
+            return timeZone
+        }
+        // Then check persistent storage
+        if let timeZoneId = watchPreferencesService.getWatchTimeZone(watchName: watchName),
+           let timeZone = TimeZone(identifier: timeZoneId) {
+            watchTimeZones[watchName] = timeZone
+            return timeZone
         }
         return TimeZone.current
     }
     
     // Save time zone for specific watch
     func saveTimeZone(_ timeZone: TimeZone, for watchName: String) {
+        // Update in-memory cache (triggers @Published update)
+        watchTimeZones[watchName] = timeZone
+        // Persist to UserDefaults
         watchPreferencesService.saveWatchTimeZone(watchName: watchName, timeZoneId: timeZone.identifier)
+        // Force objectWillChange to ensure UI updates
+        objectWillChange.send()
     }
 }

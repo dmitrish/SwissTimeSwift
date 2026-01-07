@@ -2,9 +2,21 @@
 import SwiftUI
 
 struct LeonardAutomaticWatch: View {
+    let timeZone: TimeZone
+
     @State private var currentTime = Date()
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    
+
+    init(timeZone: TimeZone = .current) {
+        self.timeZone = timeZone
+    }
+
+    private var calendar: Calendar {
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = timeZone
+        return cal
+    }
+
     var body: some View {
         GeometryReader { geometry in
             let size = min(geometry.size.width, geometry.size.height)
@@ -15,12 +27,11 @@ struct LeonardAutomaticWatch: View {
                 // Static content
                 Canvas { context, canvasSize in
                     drawClockFace(context: context, center: center, radius: radius)
-                    drawHourMarkersAndNumbers(context: context, center: center, radius: radius, currentTime: currentTime)
+                    drawHourMarkersAndNumbers(context: context, center: center, radius: radius, currentTime: currentTime, calendar: calendar)
                 }
                 
                 // Animated content
                 Canvas { context, canvasSize in
-                    let calendar = Calendar.current
                     let hour = calendar.component(.hour, from: currentTime) % 12
                     let minute = calendar.component(.minute, from: currentTime)
                     let second = calendar.component(.second, from: currentTime)
@@ -180,7 +191,7 @@ private func drawClockFace(context: GraphicsContext, center: CGPoint, radius: CG
     context.stroke(moonphaseRect, with: .color(clockBorderColor), lineWidth: 0.7)
 }
 
-private func drawHourMarkersAndNumbers(context: GraphicsContext, center: CGPoint, radius: CGFloat, currentTime: Date) {
+private func drawHourMarkersAndNumbers(context: GraphicsContext, center: CGPoint, radius: CGFloat, currentTime: Date, calendar: Calendar) {
     // Roman numerals
     let romanNumerals = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"]
     
@@ -232,7 +243,6 @@ private func drawHourMarkersAndNumbers(context: GraphicsContext, center: CGPoint
     context.stroke(dateWindow, with: .color(.black), lineWidth: 0.4)
     
     // Date text
-    let calendar = Calendar.current
     let day = calendar.component(.day, from: currentTime)
     
     context.draw(
