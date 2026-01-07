@@ -53,7 +53,7 @@ Add output file: $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/defaul
     <th>Welcome Screen</th>
   </tr>
   <tr>
-    <td style="width:33%"><img src="https://github.com/dmitrish/SwissTimeSwift/blob/main/docs/iosWaterShader.gif"/></td>
+    <td style="width:33%"><img src="https://github.com/dmitrish/SwissTimeSwift/blob/main/docs/zeitwerkwatereffect.gif"/></td>
     <td style="width:33%"><img src="https://github.com/dmitrish/SwissTimeSwift/blob/main/docs/iosWaterShader2.gif"/></td>
     <td style="width:33%"><img src="https://github.com/dmitrish/SwissTimeSwift/blob/main/docs/siwsstimeswift-welcome.gif"/></td>
   </tr>
