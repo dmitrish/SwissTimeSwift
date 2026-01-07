@@ -32,7 +32,7 @@ Add output file: $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/defaul
   </tr>
   <tr>
     <td style="vertical-align:top; text-align:center; padding:10px;">
-      <img src="https://raw.githubusercontent.com/dmitrish/SwissTimeSwift/main/docs/swisstimeswift-timescreen.gif" 
+      <img src="https://raw.githubusercontent.com/dmitrish/SwissTimeSwift/main/docs/iostimejapan.gif" 
            style="height:500px; width:auto;"/>
     </td>
     <td style="vertical-align:top; text-align:center; padding:10px;">
