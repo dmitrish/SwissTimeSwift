@@ -60,11 +60,17 @@ extension AppSettings {
     }
     
     static var useUSTimeFormat: Bool {
-        get { load().useUSTimeFormat }
+        get {
+            // Use the same key as WatchPreferencesService for consistency
+            userDefaults.object(forKey: "use_us_time_format") as? Bool ?? true
+        }
         set {
+            // Save to both the old JSON format and the new individual key for consistency
             var settings = load()
             settings.useUSTimeFormat = newValue
             settings.save()
+            // Also save to the individual key that WatchPreferencesService uses
+            userDefaults.set(newValue, forKey: "use_us_time_format")
         }
     }
     
