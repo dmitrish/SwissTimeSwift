@@ -143,6 +143,7 @@ struct AboutView: View {
             .padding(.horizontal, 24)
             .frame(maxWidth: .infinity)
         }
+        .appBackground()
         .navigationTitle("About")
         .navigationBarTitleDisplayMode(.inline)
     }
